@@ -1,7 +1,6 @@
 # Datamining Project
 
-Joshua Greene
-
+Joshua Greene  
 Jared Scott Phillips
 
 UTSA Fall 2020
