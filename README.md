@@ -7,7 +7,7 @@ UTSA Fall 2020
 
 In this datamining project, we implement three datamining algorithms and compare their performance to the same algorithms from common libraries.  We also apply the algorithms to a sporting goods store's data and present the results.
 
-##Milestones
+## Milestones
 
   *Project Proposal                  due 10-05-2020 (in progress)  
   *Progress Report                   due 10-26-2020 (pending)  
