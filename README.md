@@ -9,7 +9,7 @@ In this datamining project, we implement three datamining algorithms and compare
 
 ## Milestones
 
-  - Project Proposal                  due 10-05-2020 (in progress)  
+  > Project Proposal                  due 10-05-2020 (in progress)  
   - Progress Report                   due 10-26-2020 (pending)  
   - Final Report for class            due 11-30-2020 (pending)  
   - Project Presentation for class    due 11-30-2020 (pending)  
