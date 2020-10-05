@@ -1,5 +1,5 @@
-# Data Mining Project Name
-# Team Name
+# Coupons & Consumers
+# The Green Team
 
 Joshua Greene  
 Jared Scott Phillips
