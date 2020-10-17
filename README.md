@@ -10,7 +10,8 @@ In this datamining project, we implement three datamining algorithms and compare
 ## Milestones
 
 ```  
-Project Proposal                  due 10-05-2020 (in progress)  
+Project Proposal                  due 10-05-2020 (finished)
+Algorithm 1: FP-Growth                           (in progress)  
 Progress Report                   due 10-26-2020 (pending)  
 Final Report for class            due 11-30-2020 (pending)  
 Project Presentation for class    due 11-30-2020 (pending)  
@@ -19,7 +20,7 @@ Presentation for Store Owners     due 12-04-2020 (pending)
 
 ## Algorithms
 
-We chose to implement the FP-Tree algorithm for association pattern mining, k-means clustering to group customers into outdoor sporting activity categories, and a support vector machine for coupon use prediction.
+We chose to implement the FP-Growth algorithm for association pattern mining, k-means clustering to group customers into outdoor sporting activity categories, and a support vector machine for coupon use prediction.
 
 ## Datasets
 
