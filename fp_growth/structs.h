@@ -1,4 +1,5 @@
-
+#ifndef HEADER_FILE
+#define HEADER_FILE
 
 /*************************************************
  * transaction_set linked list
@@ -14,6 +15,7 @@ struct trans_node
 
 struct trans_set
 {
+    int num_items;
     int num_trans;
     struct trans_node **trans_list;
 } trans_set;
@@ -57,3 +59,5 @@ struct tree
 {
     struct tree_node *tree;
 } tree;
+
+#endif

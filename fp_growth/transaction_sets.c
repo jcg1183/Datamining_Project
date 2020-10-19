@@ -2,50 +2,30 @@
 #include <stdlib.h>
 #include "structs.h"
 
-int main()
-{
-    int i, j;
+void print_trans_set(struct trans_set *set1);
+struct trans_set *build_trans_set(char *file_name);
 
-    struct trans_set transaction_list;
+void print_trans_set(struct trans_set *set1)
+{
+    int i;
     struct trans_node *pcurr;
 
-    transaction_list.num_trans = 3;
-    transaction_list.trans_list = (struct trans_node **)malloc(transaction_list.num_trans * sizeof(struct trans_list *));
-
-    if (transaction_list.trans_list == NULL)
+    if (set1 == NULL)
     {
-        printf("Transaction list memory allocation fail.\n");
-        return -1;
+        return;
     }
 
-    for (i = 0; i < transaction_list.num_trans; i++)
+    printf("\n-----Transaction Set-----\n\n");
+    printf("num transactions: %d\n", set1->num_trans);
+    printf("num unique items: %d\n\n", set1->num_items);
+
+    for (i = 0; i < set1->num_trans; i++)
     {
-        for (j = 0; j < 5; j++)
-        {
-            if (j == 0)
-            {
-                transaction_list.trans_list[i] = (struct trans_node *)malloc(sizeof(struct trans_node));
-                pcurr = transaction_list.trans_list[i];
-                pcurr->item = j;
-                pcurr->pnext = NULL;
-            }
-            else
-            {
-                pcurr->pnext = (struct trans_node *)malloc(sizeof(struct trans_node));
-                pcurr = pcurr->pnext;
-                pcurr->item = j;
-                pcurr->pnext = NULL;
-            }
-        }
-    }
+        pcurr = set1->trans_list[i];
 
-    for (i = 0; i < transaction_list.num_trans; i++)
-    {
-        pcurr = transaction_list.trans_list[i];
+        printf("set[%d]: ", i + 1);
 
-        printf("[%d] : ", i);
-
-        for (j = 0; j < 5; j++)
+        while (pcurr != NULL)
         {
             printf("%d ", pcurr->item);
             pcurr = pcurr->pnext;
@@ -54,5 +34,88 @@ int main()
         printf("\n");
     }
 
-    return 1;
+    printf("\n");
+}
+
+struct trans_set *build_trans_set(char *file_name)
+{
+    int i, j, num, temp, count;
+
+    FILE *file = fopen(file_name, "r");
+
+    struct trans_set *set1;
+
+    struct trans_node *pcurr;
+    struct trans_node *ptemp;
+
+    if (file == NULL)
+    {
+        printf("Could not open file: %s\n", file_name);
+        return NULL;
+    }
+
+    set1 = (struct trans_set *)malloc(sizeof(struct trans_set));
+
+    if (set1 == NULL)
+    {
+        printf("Could not allocate transaction set memory.\n");
+        return NULL;
+    }
+
+    // Read number of unique items in transaction list
+    count = fscanf(file, "%d", &set1->num_items);
+
+    if (count == 0)
+    {
+        printf("Could not read number of unique items in file: %s\n", file_name);
+    }
+
+    // Read number of transactions in transaction list
+    count = fscanf(file, "%d", &set1->num_trans);
+
+    if (count == 0)
+    {
+        printf("Could not read number of transactions in file: %s\n", file_name);
+    }
+
+    set1->trans_list = (struct trans_node **)malloc(set1->num_trans * sizeof(struct trans_node *));
+
+    if (set1->trans_list == NULL)
+    {
+        printf("Could not allocate memory for transaction list\n");
+    }
+
+    for (i = 0; i < set1->num_trans; i++)
+    {
+        set1->trans_list[i] = NULL;
+
+        count = fscanf(file, "%d", &num);
+
+        for (j = 0; j < num; j++)
+        {
+            ptemp = (struct trans_node *)malloc(sizeof(trans_node));
+
+            if (ptemp == NULL)
+            {
+                printf("Could not allocate trans_node memory.\n");
+                exit(0);
+            }
+
+            count = fscanf(file, "%d", &ptemp->item);
+            ptemp->pnext = NULL;
+
+            if (j == 0)
+            {
+                set1->trans_list[i] = ptemp;
+                pcurr = set1->trans_list[i];
+            }
+            else
+            {
+                pcurr->pnext = ptemp;
+                pcurr = pcurr->pnext;
+            }
+        }
+    }
+
+    return set1;
 }
