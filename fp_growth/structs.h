@@ -10,6 +10,7 @@
 struct trans_node
 {
     int item;
+    int order;
     struct trans_node *pnext;
 } trans_node;
 
@@ -30,6 +31,7 @@ struct support_node
 {
     int item;
     int count;
+    int order;
     struct tree_node *item_in_tree;
 } support_node;
 
