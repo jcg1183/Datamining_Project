@@ -4,6 +4,7 @@
 
 struct support_set *build_support_set(struct trans_set *transaction_set);
 void print_support_set(struct support_set *set1);
+void add_support_order(struct support_set *support_set1, struct trans_set *trans_set1);
 
 void sort_support_set(struct support_set *set1, int l, int r);
 void merge(struct support_set *set1, int l, int m, int r);
@@ -11,21 +12,56 @@ void merge(struct support_set *set1, int l, int m, int r);
 void unmerge(struct support_set *set1, int l, int m, int r);
 void unsort_support_set(struct support_set *set1, int l, int r);
 
-struct trans_node *sort_trans_items(struct support_set *support_set1, struct trans_set *trans_set1);
-void add_support_order(struct support_set *support_set1, struct trans_set *trans_set1);
+struct support_set *build_support_set(struct trans_set *transaction_set)
+{
+    int i, j;
+    struct trans_node *pcurr;
 
-struct trans_node *sort_trans_items(struct support_set *support_set1, struct trans_set *trans_set1)
+    struct support_set *support_set;
+
+    support_set = (struct support_set *)malloc(sizeof(struct support_set));
+
+    support_set->num_items = transaction_set->num_items;
+
+    support_set->support_list = (struct support_node **)malloc(support_set->num_items * sizeof(struct support_node *));
+
+    for (i = 0; i < support_set->num_items; i++)
+    {
+        support_set->support_list[i] = (struct support_node *)malloc(sizeof(struct support_node));
+
+        support_set->support_list[i]->item = i;
+        support_set->support_list[i]->count = 0;
+        support_set->support_list[i]->order = 0;
+        support_set->support_list[i]->head_tree = NULL;
+        support_set->support_list[i]->end_tree = NULL;
+    }
+
+    for (i = 0; i < transaction_set->num_trans; i++)
+    {
+        pcurr = transaction_set->trans_list[i];
+
+        while (pcurr != NULL)
+        {
+            support_set->support_list[pcurr->item]->count += 1;
+            pcurr = pcurr->pnext;
+        }
+    }
+
+    return support_set;
+}
+
+void print_support_set(struct support_set *set1)
 {
     int i;
 
-    struct trans_node *head;
+    printf("\n-----Support Set-----\n");
 
-    for (i = 0; i < trans_set1->num_trans; i++)
+    for (i = 0; i < set1->num_items; i++)
     {
-        head = trans_set1->trans_list[i];
+        printf("Item %d: count: %d order %d\n", set1->support_list[i]->item, set1->support_list[i]->count, set1->support_list[i]->order);
     }
 
-    return NULL;
+    return;
 }
 
 void add_support_order(struct support_set *support_set1, struct trans_set *trans_set1)
@@ -43,6 +79,20 @@ void add_support_order(struct support_set *support_set1, struct trans_set *trans
     unsort_support_set(support_set1, 0, support_set1->num_items - 1);
 
     return;
+}
+
+void sort_support_set(struct support_set *set1, int l, int r)
+{
+    if (l < r)
+    {
+        int m = l + (r - l) / 2;
+
+        // Sort first and second halves
+        sort_support_set(set1, l, m);
+        sort_support_set(set1, m + 1, r);
+
+        merge(set1, l, m, r);
+    }
 }
 
 void merge(struct support_set *set1, int l, int m, int r)
@@ -112,17 +162,17 @@ void merge(struct support_set *set1, int l, int m, int r)
     }
 }
 
-void sort_support_set(struct support_set *set1, int l, int r)
+void unsort_support_set(struct support_set *set1, int l, int r)
 {
     if (l < r)
     {
         int m = l + (r - l) / 2;
 
         // Sort first and second halves
-        sort_support_set(set1, l, m);
-        sort_support_set(set1, m + 1, r);
+        unsort_support_set(set1, l, m);
+        unsort_support_set(set1, m + 1, r);
 
-        merge(set1, l, m, r);
+        unmerge(set1, l, m, r);
     }
 }
 
@@ -191,69 +241,4 @@ void unmerge(struct support_set *set1, int l, int m, int r)
         j++;
         k++;
     }
-}
-
-void unsort_support_set(struct support_set *set1, int l, int r)
-{
-    if (l < r)
-    {
-        int m = l + (r - l) / 2;
-
-        // Sort first and second halves
-        unsort_support_set(set1, l, m);
-        unsort_support_set(set1, m + 1, r);
-
-        unmerge(set1, l, m, r);
-    }
-}
-
-void print_support_set(struct support_set *set1)
-{
-    int i;
-
-    printf("\n-----Support Set-----\n");
-
-    for (i = 0; i < set1->num_items; i++)
-    {
-        printf("Item %d: count: %d order %d\n", set1->support_list[i]->item, set1->support_list[i]->count, set1->support_list[i]->order);
-    }
-
-    return;
-}
-
-struct support_set *build_support_set(struct trans_set *transaction_set)
-{
-    int i, j;
-    struct trans_node *pcurr;
-
-    struct support_set *support_set;
-
-    support_set = (struct support_set *)malloc(sizeof(struct support_set));
-
-    support_set->num_items = transaction_set->num_items;
-
-    support_set->support_list = (struct support_node **)malloc(support_set->num_items * sizeof(struct support_node *));
-
-    for (i = 0; i < support_set->num_items; i++)
-    {
-        support_set->support_list[i] = (struct support_node *)malloc(sizeof(struct support_node));
-
-        support_set->support_list[i]->item = i;
-        support_set->support_list[i]->count = 0;
-        support_set->support_list[i]->order = 0;
-        support_set->support_list[i]->item_in_tree = NULL;
-    }
-
-    for (i = 0; i < transaction_set->num_trans; i++)
-    {
-        pcurr = transaction_set->trans_list[i];
-
-        while (pcurr != NULL)
-        {
-            support_set->support_list[pcurr->item]->count += 1;
-            pcurr = pcurr->pnext;
-        }
-    }
-
-    return support_set;
 }

@@ -32,7 +32,8 @@ struct support_node
     int item;
     int count;
     int order;
-    struct tree_node *item_in_tree;
+    struct tree_node *head_tree;
+    struct tree_node *end_tree;
 } support_node;
 
 struct support_set
@@ -51,6 +52,7 @@ struct tree_node
 {
     int item;
     int count;
+    int num_children;
     struct tree_node *parent;
     struct tree_node **children;
     struct tree_node *next_item;

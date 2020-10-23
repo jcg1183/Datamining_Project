@@ -3,6 +3,7 @@
 #include "structs.h"
 #include "transaction_sets.c"
 #include "support_count.c"
+#include "tree.c"
 
 int main()
 {
@@ -21,6 +22,10 @@ int main()
     sort_trans_item_sets(support1, transaction_set);
 
     print_trans_set(transaction_set);
+
+    struct tree *tree1 = build_tree(support1, transaction_set);
+
+    print_fp_tree(tree1, support1);
 
     return 1;
 }
