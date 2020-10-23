@@ -3,6 +3,8 @@
 # a member number and date and adds transaction ids to all transactions.
 
 import pandas as pd
+import os
+from subprocess import call
 
 # Load dataset into a Dataframe
 df = pd.read_csv("Groceries_dataset.csv")
@@ -12,6 +14,9 @@ df = df.sort_values(by="Member_number")
 
 # Create new DataFrame for cleaned data
 df_clean = pd.DataFrame(columns=df.columns)
+
+# Get the number of unique items in the dataset
+unique_items = len(pd.Series.unique(df['itemDescription']))
 
 # Hardcoded Member_number range and loop
 for Member_number in range(1000, 5001):
@@ -59,17 +64,53 @@ df_clean = df_clean.sort_values(by="Date")
 
 # Prepare Transaction_id list and padding
 Transaction_id = []
-max_pad = len(str(len(df_clean))) + 1
+pad = len(str(len(df_clean)))
 
 # Create the Transaction_id column
 for n in range(0, len(df_clean)):
     
     n = str(n)
-    pad = max_pad - len(n)
     new_id = "T" + n.zfill(pad)
     Transaction_id.append(new_id)
     
 # Add the Transaction_id column to the cleaned DataFrame
 df_clean['Transaction_id'] = Transaction_id
+# Get the number of transactions in the updated DataFrame
+transaction_count = len(df_clean)
 
+print("Unique Items:", unique_items)
+print("Transaction count:", transaction_count)
 print(df_clean)
+
+# Export the updated dataset to csv
+df_clean.to_csv('Updated_Groceries_dataset.csv')
+
+# If an input file already exists, remove it
+if os.path.exists("input.txt"):
+    os.remove("input.txt")
+
+# Create a new input file using the updated DataFrame
+with open("input.txt","a") as f:
+    
+    # Append unique item count and transaction count
+    print(unique_items, file=f)
+    print(transaction_count, file=f)
+    
+    # For every row in the DataFrame
+    for n in range(0, transaction_count):
+        
+        # Get the number of items
+        num_items = len(df_clean.iloc[n]['itemDescription'])
+        
+        # Get a copy of the itemDescription list
+        items = df_clean.iloc[n]['itemDescription'].copy()
+        line = ""
+        
+        # Replace all spaces in the item names with underscores
+        for i in range(0, len(items)):
+            line += " " + items[i].replace(" ","_")
+        
+        # Append data to the input file
+        print(num_items, line, file=f)
+        
+call(["./fp_growth", "input.txt"])
