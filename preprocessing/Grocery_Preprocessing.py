@@ -112,5 +112,3 @@ with open("input.txt","a") as f:
         
         # Append data to the input file
         print(num_items, line, file=f)
-        
-call(["./fp_growth", "input.txt"])
