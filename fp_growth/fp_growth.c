@@ -9,7 +9,7 @@ int main()
 {
     int i, j;
 
-    struct trans_set *transaction_set = build_trans_set("input.txt");
+    struct trans_set *transaction_set = build_trans_set("fp_growth167.txt");
 
     print_trans_set(transaction_set);
 
