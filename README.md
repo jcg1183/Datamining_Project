@@ -16,7 +16,7 @@ Algorithm 0: FP-Growth            (completed)
 Progress Report                   due 10-26-2020 (completed)
 Algorithm 1: K-Means              (in progress)
 Algorithm 2: PAM/K-Medoid         (in progress)
-Algorithm 3: AGNES                (in progress)
+Algorithm 3: ???                  (pending)
 Final Report for class            due 11-30-2020 (pending)  
 Project Presentation for class    due 11-30-2020 (pending)  
 Presentation for Store Owners     due 12-04-2020 (cancelled)  
@@ -24,7 +24,7 @@ Presentation for Store Owners     due 12-04-2020 (cancelled)
 
 ## Algorithms
 
-We chose to implement the K-Means, PAM, and AGNES clustering algorithms.
+We chose to implement the K-Means, PAM, and ??? clustering algorithms.
 
 ## Datasets
 
