@@ -1,4 +1,4 @@
-# Coupons & Consumers
+# Clustering Algorithms (Formerly Coupons & Consumers)
 # The Green Team
 
 Joshua Greene  
@@ -6,28 +6,29 @@ Jared Scott Phillips
 
 UTSA Fall 2020
 
-In this data mining project, we implement three data mining algorithms and compare their performance to the same algorithms from common libraries.  We also apply the algorithms to a sporting goods store's data and present the results.
+In this data mining project, we implement three clustering algorithms and benchmark their performance against existing programming libraries.
 
 ## Milestones
 
 ```  
-Project Proposal                  due 10-05-2020 (finished)
-Algorithm 1: FP-Growth                           (in progress)  
-Progress Report                   due 10-26-2020 (pending)  
+Project Proposal                  due 10-05-2020 (completed)
+Algorithm 0: FP-Growth            (completed)  
+Progress Report                   due 10-26-2020 (completed)
+Algorithm 1: K-Means              (in progress)
+Algorithm 2: PAM/K-Medoid         (in progress)
+Algorithm 3: AGNES                (in progress)
 Final Report for class            due 11-30-2020 (pending)  
 Project Presentation for class    due 11-30-2020 (pending)  
-Presentation for Store Owners     due 12-04-2020 (pending)  
+Presentation for Store Owners     due 12-04-2020 (cancelled)  
 ```
 
 ## Algorithms
 
-We chose to implement the FP-Growth algorithm for association pattern mining, k-means clustering to group customers into outdoor sporting activity categories, and a support vector machine for coupon use prediction.
+We chose to implement the K-Means, PAM, and AGNES clustering algorithms.
 
 ## Datasets
 
-Our project performs analysis on transactional data from a small sporting goods store.  To develop and test the algorithms, we used a [small grocery store transaction dataset](https://www.kaggle.com/heeraldedhia/groceries-dataset) from Kaggle.  
-
-The sporting goods store data will not be made publicly available.
+We are currently looking for viable datasets to use for our project
 
 ## Our Libraries
 
