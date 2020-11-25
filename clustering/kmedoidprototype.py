@@ -130,3 +130,4 @@ for i in range(2,9):
     for thing in output:
         print(thing)
     print()
+    
