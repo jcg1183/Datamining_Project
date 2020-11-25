@@ -9,16 +9,14 @@ import time
 
 def dbscan(ds, numSamples, epsilon, minPts):
     df = ds.df.copy()
-
+    df = df[:numSamples]
     clusterCount = 0
 
-    df["neighbors"] = [[] for _ in range(df.shape()[0])]
+    df["neighbors"] = [[] for _ in range(numSamples)]
     df["visited"] = 0
     df["cluster"] = -1
 
-    distanceArray = get_distances(df)
-
-    count_neighbors(df, distanceArray, epsilon)
+    count_neighbors(df, ds.distanceArray[:numSamples, :numSamples], epsilon)
 
     print("Running DBSCAN")
 
@@ -68,38 +66,7 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
     print("dbscan time: {0:5.4}\n".format((dbscanTimeStop - dbscanTimeStart) * 100))
 
-
-def get_distances(df):
-    print("get_distances")
-
-    getDistancesTimeStart = time.perf_counter()
-
-    numPoints = df.shape[0]
-
-    distanceArray = np.zeros([numPoints, numPoints], dtype=float)
-
-    for i in range(numPoints):
-        for j in range(i, numPoints):
-            if i == j:
-                continue
-
-            distance = math.sqrt(
-                math.pow(df.iloc[i]["x1"] - df.iloc[j]["x1"], 2)
-                + math.pow(df.iloc[i]["x2"] - df.iloc[j]["x2"], 2)
-            )
-
-            distanceArray[i, j] = distance
-            distanceArray[j, i] = distance
-
-    getDistancesTimeStop = time.perf_counter()
-
-    print(
-        "get_distances time: {0:5.4}\n".format(
-            (getDistancesTimeStop - getDistancesTimeStart) * 100
-        )
-    )
-
-    return distanceArray
+    return "results"
 
 
 def count_neighbors(df, distanceArray, epsilon):
