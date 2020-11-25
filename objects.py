@@ -31,3 +31,7 @@ class dataset:
     def __init__(self, name, df):
         self.name = name
         self.df = df
+        self.distances = get_distances(df)
+
+    def get_distances(self, df):
+        

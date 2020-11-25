@@ -13,6 +13,8 @@ def dbscan(ds, numSamples, epsilon, minPts):
     clusterCount = 0
 
     df["neighbors"] = [[] for _ in range(df.shape()[0])]
+    df["visited"] = 0
+    df["cluster"] = -1
 
     distanceArray = get_distances(df)
 
