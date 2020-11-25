@@ -7,6 +7,9 @@ from objects import experiment, dataset
 from dbscan import dbscan
 import pandas as pd
 from sklearn import datasets
+import time
+import math
+import numpy as np
 
 
 def main():
@@ -17,9 +20,10 @@ def main():
     datasets = ready_datasets(args)
 
     # build experiment object, including datasets
-    # constructor calls a function to calculate distances
-    # between data points
     exp = experiment(datasets, settings.algorithms)
+
+    # calculate distances for each dataset
+    calculate_distances(exp)
 
     # run an experiment with all algorithms and datasets
     if args.experiment:
@@ -74,10 +78,13 @@ def run_experiment(exp):
                     if algo == "k-means":
 
                         # call k-means and save results here
+                        print()
 
                     if algo == "k-medoid":
 
                         # call k-medoid and save results here
+                        print()
+
 
 # add appropriate comments
 # this function uses command line arguments to generate
@@ -127,6 +134,41 @@ def build_dataset(name):
         print(df.head(5))
 
     return df
+
+
+def calculate_distances(exp):
+    print("calculate_distances")
+
+    for ds in exp.datasets:
+        df = ds.df
+
+        getDistancesTimeStart = time.perf_counter()
+
+        ds.distanceArray = np.zeros(
+            [settings.maxSamples, settings.maxSamples], dtype=float
+        )
+
+        for i in range(settings.maxSamples):
+            for j in range(i, settings.maxSamples):
+                if i == j:
+                    continue
+
+                distance = math.sqrt(
+                    math.pow(df.iloc[i]["x1"] - df.iloc[j]["x1"], 2)
+                    + math.pow(df.iloc[i]["x2"] - df.iloc[j]["x2"], 2)
+                )
+
+                ds.distanceArray[i, j] = distance
+                ds.distanceArray[j, i] = distance
+
+        getDistancesTimeStop = time.perf_counter()
+
+        print(
+            "get_distances time: {0:5.4}\n".format(
+                (getDistancesTimeStop - getDistancesTimeStart) * 100
+            )
+        )
+
 
 # add formatted comments
 # this function uses 'argparse' library to parse
