@@ -28,12 +28,15 @@ def main():
     # run k-means algorithm on specified datasets
     if args.kmeans:
         # call k-means wrapper function
+        print()
 
     if args.kmedoids:
         # call k-medoids wrapper function
+        print()
 
     if args.dbscan:
         # call dbscan wrapper function
+        print()
 
     # process results here
 
