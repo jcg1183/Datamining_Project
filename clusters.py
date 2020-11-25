@@ -4,6 +4,7 @@ import argparse
 import sys
 import settings
 from objects import experiment, dataset
+from dbscan import dbscan
 import pandas as pd
 from sklearn import datasets
 
@@ -13,7 +14,24 @@ def main():
 
     datasets = ready_datasets(args)
 
+    exp = experiment(datasets, settings.algorithms)
+
+    run_experiment(exp)
     # exp1 = experiment(str(args.numruns))
+
+
+def run_experiment(exp):
+    for algo in exp.algorithms:
+        for ds in exp.datasets:
+            for num in settings.numSamples:
+                for i in range(1, settings.numRuns + 1):
+
+                    if algo == dbscan:
+                        for eps in settings.epsilons:
+                            for mp in settings.minPts:
+                                results = dbscan(ds, num, eps, mp)
+
+                                exp.results[algo].append(ds.name, num, i, results)
 
 
 def ready_datasets(args):
@@ -28,14 +46,12 @@ def ready_datasets(args):
 
     if args.generate:
         for name in settings.datasetTypes:
-            datasetReturn.append(
-                dataset(name, build_dataset(name, int(args.numsamples)))
-            )
+            datasetReturn.append(dataset(name, build_dataset(name)))
 
     return datasetReturn
 
 
-def build_dataset(name, numSamples):
+def build_dataset(name):
     # build all the dataset types here
     df = pd.DataFrame()
 
@@ -47,10 +63,6 @@ def build_dataset(name, numSamples):
         df = pd.DataFrame(noisy_circles[0], columns=["x1", "x2"])
 
         df["y"] = noisy_circles[1]
-
-        df["visited"] = 0
-        df["cluster"] = -1
-        df["neighbors"] = [[] for _ in range(numSamples)]
 
         print("circles dataset generated")
         print(df.head(5))
@@ -68,28 +80,10 @@ def run_parser():
         "-g", "--generate", action="store_true", help="generate all dataset types"
     )
 
-    parser.add_argument(
-        "-r",
-        "--numruns",
-        action="store",
-        help="number of runs per algorithm",
-        default=5,
-    )
-
-    parser.add_argument(
-        "-s",
-        "--numsamples",
-        action="store",
-        help="number of samples per dataset",
-        default=500,
-    )
-
     if len(sys.argv) == 1:
         print("\nPlease provide command line arguments")
         print("-d or --dataset {./dataset.csv}")
-        print("-g or --generate to generate several dataset types")
-        print("-r or --numruns {int}")
-        print("-s or --numsamples {int}\n")
+        print("-g or --generate to generate several dataset types\n")
         exit()
 
     args = parser.parse_args()
@@ -100,18 +94,6 @@ def run_parser():
     if args.generate:
         print("The following datasets will be generated:")
         print("\tlist some datasets")
-
-    if int(args.numruns) > 0:
-        print("Each algorithm will be run {0} times.".format(args.numruns))
-    else:
-        print("\nInvalid number of runs.\n")
-        exit()
-
-    if int(args.numsamples) > 0:
-        print("Each dataset will have {0} samples.".format(args.numsamples))
-    else:
-        print("\nInvalid number of samples.\n")
-        exit()
 
     return args
 

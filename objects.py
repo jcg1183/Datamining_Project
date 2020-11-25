@@ -1,13 +1,21 @@
 import settings
+from dbscan import dbscan
 
 
 class experiment:
     def __init__(self, datasets, algorithms):
         self.datasets = datasets
-        self.algorithms = []
+        self.algorithms = algorithms
+        self.functions = {}
 
         for algo in algorithms:
-            self.algorithms.append(algorithm(algo))
+            if algo == "DBSCAN":
+                self.functions[algo] = dbscan
+
+        self.results = {}
+
+        for algo in algorithms:
+            self.results[algo] = []
 
         print("Experiment created")
 
