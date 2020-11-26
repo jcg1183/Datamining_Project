@@ -5,6 +5,32 @@ from random import randint
 import math
 import matplotlib.pyplot as plt
 
+def run_kbrain(k, algorithm, data):
+    return_label = []
+    return_centers = []
+    
+    #if data == None:
+    #    data = generate_random_dataset()
+    
+    initial_centers = generate_random_centers(k, data)
+    
+    return_label, return_centers = generate_clusters(k, data, initial_centers, algorithm)
+    
+    autoplot(k, data, return_centers, return_label, algorithm)
+    
+    return return_label, return_centers
+
+def autoplot(k, df, centers, labels, alg):
+    # NOTE: Only works for two dimensions currently
+    for n in range(0,k):
+        plt.scatter(df.x1[labels == n], df.x2[labels == n])
+        plt.scatter(centers[n][0], centers[n][1], c='k')
+    
+    title = alg + " with K = " + str(k)
+    plt.title(title)
+    plt.show()
+    plt.clf()
+
 def euclidean_distance(pointA, pointB):
     # Function returns the euclidean distance between two points
     return_dist = 0
@@ -183,30 +209,3 @@ def generate_clusters(k, points, centers, algorithm):
     
     # Return the cluster labels and the final centers
     return return_labels, centers
-
-def autoplot(k, df, centers, labels):
-    print("Flag D")
-    # NOTE: Only works for two dimensions currently
-    for n in range(0,k):
-        plt.scatter(df.x1[labels == n], df.x2[labels == n])
-        plt.scatter(centers[n][0], centers[n][1], c='k')
-    
-    plt.show()
-    plt.clf()
-
-def run_kbrain(k, algorithm, data = None):
-    print("Flag C")
-    return_label = []
-    return_centers = []
-    
-    if data == None:
-        data = generate_random_dataset()
-    
-    initial_centers = generate_random_centers(k, data)
-    
-    return_label, return_centers = generate_clusters(k, data, initial_centers, algorithm)
-    
-    autoplot(k, data, return_centers, return_label)
-    
-    return return_label, return_centers
-    

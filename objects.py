@@ -12,7 +12,7 @@ class experiment:
         for algo in algorithms:
             if algo == "DBSCAN":
                 self.functions[algo] = dbscan
-            if algo == "k-means" or algo == "k-medoids":
+            if algo == "k-means" or algo == "k-medoid":
                 self.functions[algo] = KBRAIN
 
         self.results = {}

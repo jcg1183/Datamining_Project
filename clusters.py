@@ -5,7 +5,7 @@ import sys
 import settings
 from objects import experiment, dataset
 from dbscan import dbscan
-from clustering import KBRAIN
+from KBRAIN import run_kbrain
 import pandas as pd
 from sklearn import datasets
 import time
@@ -58,7 +58,7 @@ def run_experiment(exp):
 
             # loop through the number of datapoints
             # to be used
-            for num in settings.numSamples:
+            for num in range(0,1):#settings.numSamples:
 
                 # loop for each trial run
                 for i in range(1, settings.numRuns + 1):
@@ -78,17 +78,15 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        for k in range(2,5):
-                            print("Flag A")
-                            labels, centroids = KBRAIN.run_kbrain(k, algo, ds)
-                            exp.results[algo].append(ds.name, num, k, labels, centroids)
+                        for k in range(2,6):
+                            labels, centroids = run_kbrain(k, algo, ds.df)
+                            #exp.results[algo].append(ds.name, num, k, labels, centroids)
 
-                    if algo == "k-medoids":
+                    if algo == "k-medoid":
 
-                        for k in range(2,5):
-                            print("Flag B")
-                            labels, medoids = KBRAIN.run_kbrain(k, algo, ds)
-                            exp.results[algo].append(ds.name, num, k, labels, medoids)
+                        for k in range(2,6):
+                            labels, medoids = run_kbrain(k, algo, ds.df)
+                            #exp.results[algo].append(ds.name, num, k, labels, medoids)
 
 
 # add appropriate comments
@@ -141,8 +139,8 @@ def build_dataset(name):
     if name == "random":
         random = np.random.uniform(low=0.0, high=15.0, size=(200,2))
         df = pd.DataFrame(columns = ['x1', 'x2'])
-        df.x1 = random[0]
-        df.x2 = random[1]
+        df.x1 = random[:,0]
+        df.x2 = random[:,1]
         
         print("random dataset generated")
         print(df.head(5))

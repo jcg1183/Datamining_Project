@@ -1,11 +1,11 @@
-algorithms = ["k-means", "k-medoids"]#, "DBSCAN"]
+algorithms = ["k-means", "k-medoid"]#, "DBSCAN"]
 
 datasetTypes = ["random"] #"circles"  # , "swirls", "moons", "random"]
 
 maxSamples = 2500
 numSamples = [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500]
 
-numRuns = 5
+numRuns = 1
 
 # Parameters for DBSCAN
 epsilons = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
