@@ -5,6 +5,7 @@ import sys
 import settings
 from objects import experiment, dataset
 from dbscan import dbscan
+from clustering import KBRAIN
 import pandas as pd
 from sklearn import datasets
 import time
@@ -23,7 +24,7 @@ def main():
     exp = experiment(datasets, settings.algorithms)
 
     # calculate distances for each dataset
-    calculate_distances(exp)
+    # calculate_distances(exp)
 
     # run an experiment with all algorithms and datasets
     if args.experiment:
@@ -77,13 +78,17 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        # call k-means and save results here
-                        print()
+                        for k in range(2,5):
+                            print("Flag A")
+                            labels, centroids = KBRAIN.run_kbrain(k, algo, ds)
+                            exp.results[algo].append(ds.name, num, k, labels, centroids)
 
-                    if algo == "k-medoid":
+                    if algo == "k-medoids":
 
-                        # call k-medoid and save results here
-                        print()
+                        for k in range(2,5):
+                            print("Flag B")
+                            labels, medoids = KBRAIN.run_kbrain(k, algo, ds)
+                            exp.results[algo].append(ds.name, num, k, labels, medoids)
 
 
 # add appropriate comments
@@ -120,7 +125,7 @@ def build_dataset(name):
     # generate sklearn circles dataset
     if name == "circles":
         noisy_circles = datasets.make_circles(
-            n_samples=settings.maxSamples, factor=0.5, noise=0.05
+            n_samples=2500, factor=0.5, noise=0.05
         )
 
         # convert to dataframe
@@ -131,6 +136,15 @@ def build_dataset(name):
 
         # print functions can be deleted once finished
         print("circles dataset generated")
+        print(df.head(5))
+        
+    if name == "random":
+        random = np.random.uniform(low=0.0, high=15.0, size=(200,2))
+        df = pd.DataFrame(columns = ['x1', 'x2'])
+        df.x1 = random[0]
+        df.x2 = random[1]
+        
+        print("random dataset generated")
         print(df.head(5))
 
     return df
@@ -212,7 +226,7 @@ def run_parser():
         print("-m or --kmeans to run only the k-means algorithm")
         print("-o or --kmedoid to run only the k-medoid algorithm")
         print("-s or --dbscan to run only the dbscan algorithm\n")
-        exit()
+        return -1
 
     args = parser.parse_args()
 

@@ -77,7 +77,7 @@ def kmedoid(k, clusters, medoids, labels):
 
 def generate_random_dataset():
     # Function returns a dataframe with X/Y pairs and a column for cluster labels
-    return_df = pd.DataFrame(columns=['X','Y'])
+    return_df = pd.DataFrame(columns=['x1','x2'])
     
     # Generate a blob set to my liking for now
     X, y = datasets.make_blobs(n_samples=50,
@@ -89,8 +89,8 @@ def generate_random_dataset():
     B = np.append(X[:,1], X[:,3])
     
     # Save the X and Y coords in the return Dataframe
-    return_df.X = A
-    return_df.Y = B
+    return_df.x1 = A
+    return_df.x2 = B
     
     # Return the dataset
     return return_df
@@ -164,11 +164,15 @@ def generate_clusters(k, points, centers, algorithm):
                         return_labels[n] = m
                         
             # Algorithm pseudo-switch statement
-            if algorithm == "kmeans":
+            if algorithm == "k-means":
                 new_centers = kmean(k, points, return_labels)
                 
-            elif algorithm == "kmedoid":
+            elif algorithm == "k-medoid":
                 new_centers = kmedoid(k, points, centers, return_labels)
+            
+            else:
+                print("Error: invalid algorithm")
+                return None
             
             # Check if the new centers are the same as the old centers
             if np.array_equal(new_centers, centers):
@@ -181,22 +185,28 @@ def generate_clusters(k, points, centers, algorithm):
     return return_labels, centers
 
 def autoplot(k, df, centers, labels):
+    print("Flag D")
     # NOTE: Only works for two dimensions currently
     for n in range(0,k):
-        plt.scatter(df.X[labels == n], df.Y[labels == n])
+        plt.scatter(df.x1[labels == n], df.x2[labels == n])
         plt.scatter(centers[n][0], centers[n][1], c='k')
     
     plt.show()
     plt.clf()
 
 def run_kbrain(k, algorithm, data = None):
+    print("Flag C")
+    return_label = []
+    return_centers = []
     
     if data == None:
         data = generate_random_dataset()
     
     initial_centers = generate_random_centers(k, data)
     
-    label, centers = generate_clusters(k, data, initial_centers, algorithm)
+    return_label, return_centers = generate_clusters(k, data, initial_centers, algorithm)
     
-    # autoplot(k, data, centers, label)
+    autoplot(k, data, return_centers, return_label)
+    
+    return return_label, return_centers
     

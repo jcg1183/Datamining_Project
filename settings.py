@@ -1,6 +1,6 @@
-algorithms = ["DBSCAN"]  # , "k-means", "k-medoids"]
+algorithms = ["k-means", "k-medoids"]#, "DBSCAN"]
 
-datasetTypes = ["circles"]  # , "swirls", "moons", "random"]
+datasetTypes = ["random"] #"circles"  # , "swirls", "moons", "random"]
 
 maxSamples = 2500
 numSamples = [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500]
