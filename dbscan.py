@@ -18,7 +18,11 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
     count_neighbors(df, ds.distanceArray[:numSamples, :numSamples], epsilon)
 
-    print("Running DBSCAN")
+    print(
+        "Running DBSCAN:\n\tnumSamples: {0}\n\tepsilon: {1}\n\tminPts: {2}".format(
+            numSamples, epsilon, minPts
+        )
+    )
 
     dbscanTimeStart = time.perf_counter()
 
@@ -34,7 +38,7 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
         # add datapoint to a new cluster
         df.at[index, "cluster"] = clusterCount
-        print(df.iloc[index]["cluster"])
+
         # queue of neighbors to check
         queue = []
 
@@ -70,10 +74,6 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
 
 def count_neighbors(df, distanceArray, epsilon):
-    print("count_neighbors")
-
-    countNeighborsTimeStart = time.perf_counter()
-
     for i in range(df.shape[0]):
         row = distanceArray[i, :]
 
@@ -82,11 +82,3 @@ def count_neighbors(df, distanceArray, epsilon):
         flatList = list(itertools.chain.from_iterable(nestedList))
 
         df.iloc[i]["neighbors"].extend(flatList)
-
-    countNeighborsTimeStop = time.perf_counter()
-
-    print(
-        "count_neighbors time: {0:5.4}\n".format(
-            (countNeighborsTimeStop - countNeighborsTimeStart) * 100
-        )
-    )

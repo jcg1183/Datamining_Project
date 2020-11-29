@@ -73,7 +73,7 @@ def run_experiment(exp):
                                 results = dbscan(ds, num, eps, mp)
 
                                 # save results of each experiment
-                                exp.results[algo].append(ds.name, num, i, results)
+                                exp.results[algo].append((ds.name, num, i, results))
 
                     if algo == "k-means":
 
