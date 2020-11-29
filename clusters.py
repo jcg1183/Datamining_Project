@@ -43,6 +43,7 @@ def main():
         print()
 
     # process results here
+    analyze_results(exp)
 
 
 # replace this comment with proper formater
@@ -86,6 +87,23 @@ def run_experiment(exp):
                         print()
 
 
+def analyze_results(exp):
+    print("Analyse Results\n")
+
+    for algo in exp.results.keys():
+        if algo == "DBSCAN":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tNum Datapoints: {1}\n\tTrial Number: {2}".format(
+                        results[0], results[1], results[2]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[3])
+
+
 # add appropriate comments
 # this function uses command line arguments to generate
 # datasets from csv or sklearn
@@ -119,19 +137,25 @@ def build_dataset(name):
 
     # generate sklearn circles dataset
     if name == "circles":
-        noisy_circles = datasets.make_circles(
+        new_dataset = datasets.make_circles(
             n_samples=settings.maxSamples, factor=0.5, noise=0.05
         )
 
-        # convert to dataframe
-        df = pd.DataFrame(noisy_circles[0], columns=["x1", "x2"])
+    elif name == "moons":
+        new_dataset = datasets.make_moons(n_samples=settings.maxSamples, noise=0.05)
 
-        # add cluster labels to dataframe
-        df["y"] = noisy_circles[1]
+    elif name == "blobs":
+        new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
 
-        # print functions can be deleted once finished
-        print("circles dataset generated")
-        print(df.head(5))
+    # convert to dataframe
+    df = pd.DataFrame(new_dataset[0], columns=["x1", "x2"])
+
+    # add cluster labels to dataframe
+    df["y"] = new_dataset[1]
+
+    # print functions can be deleted once finished
+    print("{0} dataset generated".format(name))
+    print(df.head(5))
 
     return df
 

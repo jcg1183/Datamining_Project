@@ -70,7 +70,7 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
     print("dbscan time: {0:5.4}\n".format((dbscanTimeStop - dbscanTimeStart) * 100))
 
-    return "results"
+    return df["cluster"]
 
 
 def count_neighbors(df, distanceArray, epsilon):
