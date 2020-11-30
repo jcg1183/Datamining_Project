@@ -12,7 +12,7 @@ datasetTypes = ["circles", "moons", "blobs"]  # , "random"]
 maxSamples = 100
 numSamples = [100]  # , 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500]
 
-numRuns = 1
+numRuns = 5
 
 # Parameters for DBSCAN
 epsilons = [0.5]  # , 0.1, 0.15]  # , 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
