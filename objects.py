@@ -1,5 +1,6 @@
 import settings
 from dbscan import dbscan
+import KBRAIN
 
 
 class experiment:
@@ -11,6 +12,8 @@ class experiment:
         for algo in algorithms:
             if algo == "DBSCAN":
                 self.functions[algo] = dbscan
+            if algo == "k-means" or algo == "k-medoid":
+                self.functions[algo] = KBRAIN
 
         self.results = {}
 

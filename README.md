@@ -16,7 +16,7 @@ Algorithm 0: FP-Growth            (completed)
 Progress Report                   due 10-26-2020 (completed)
 Algorithm 1: K-Means              (in progress)
 Algorithm 2: PAM/K-Medoid         (in progress)
-Algorithm 3: ???                  (pending)
+Algorithm 3: DBSCAN               (in progress)
 Final Report for class            due 11-30-2020 (pending)  
 Project Presentation for class    due 11-30-2020 (pending)  
 Presentation for Store Owners     due 12-04-2020 (cancelled)  
@@ -24,11 +24,11 @@ Presentation for Store Owners     due 12-04-2020 (cancelled)
 
 ## Algorithms
 
-We chose to implement the K-Means, PAM, and ??? clustering algorithms.
+We chose to implement the K-Means, PAM/K-Medoid, and DBSCAN clustering algorithms.
 
 ## Datasets
 
-We are currently looking for viable datasets to use for our project
+We are currently looking for viable datasets to use for our project. At the moment, we are utilizing sklearn and numpy for dataset generation.
 
 ## Our Libraries
 

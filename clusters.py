@@ -5,6 +5,7 @@ import sys
 import settings
 from objects import experiment, dataset
 from dbscan import dbscan
+from KBRAIN import run_kbrain
 import pandas as pd
 from sklearn import datasets
 import time
@@ -150,16 +151,21 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
+
+                        for k in range(2,6):
+                            labels, centroids = run_kbrain(k, algo, ds.df)
+                            exp.results[algo].append((ds.name, num, k, labels, centroids)) # run_kbrain needs to be updated
+                            
                         # call k-means and save results here
                         # append the results as a tuple like comment below
                         # results should be a dataframe with one column, "cluster"
                         # (ds.name, num, i, numClusters, results)
-                        print()
 
                     if algo == "k-medoid":
 
-                        # call k-medoid and save results here
-                        print()
+                        for k in range(2,6):
+                            labels, medoids = run_kbrain(k, algo, ds.df)
+                            exp.results[algo].append((ds.name, num, k, labels, medoids))
 
                     if algo == "sklearn_kmeans":
                         for numClusters in range(1, 5):
@@ -274,19 +280,21 @@ def build_dataset(name):
 
     elif name == "blobs":
         new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
+    
+    elif name == "random":
+        # Fitting a pentagon in a square hole, needs updating asap
+        random = np.random.uniform(low=0.0, high=15.0, size=(200,2))
+        df = pd.DataFrame(columns = ['x1', 'x2'])
+        df.x1 = random[:,0]
+        df.x2 = random[:,1]
+        return df
+    
 
     # convert to dataframe
     df = pd.DataFrame(new_dataset[0], columns=["x1", "x2"])
 
     # add cluster labels to dataframe
     df["y"] = new_dataset[1]
-
-    # print functions can be deleted once finished
-    # print("{0} dataset generated".format(name))
-    # print(df.head(5))
-
-    return df
-
 
 def calculate_distances(exp):
     print("calculate_distances")
@@ -364,7 +372,7 @@ def run_parser():
         print("-m or --kmeans to run only the k-means algorithm")
         print("-o or --kmedoid to run only the k-medoid algorithm")
         print("-s or --dbscan to run only the dbscan algorithm\n")
-        exit()
+        return -1
 
     args = parser.parse_args()
 
@@ -376,6 +384,3 @@ def run_parser():
         print("\tlist some datasets")
 
     return args
-
-
-main()
