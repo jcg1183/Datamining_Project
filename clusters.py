@@ -151,13 +151,13 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        for k in range(2, 6):
+                        for k in range(1, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "k-medoids":
 
-                        for k in range(2, 6):
+                        for k in range(1, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
@@ -207,7 +207,7 @@ def print_results(exp):
                 print("Cluster Assignments:\n")
                 print(results[5])
 
-        elif algo == "sklearn_kmeans":
+        elif algo == "k-means" or algo == "sklearn_kmeans":
             all_results = exp.results[algo]
 
             for results in all_results:
@@ -219,7 +219,7 @@ def print_results(exp):
                 print("Cluster Assignments:\n")
                 print(results[4])
 
-        elif algo == "sklearn_kmedoids":
+        elif algo == "k-medoids" or algo == "sklearn_kmedoids":
             all_results = exp.results[algo]
 
             for results in all_results:
