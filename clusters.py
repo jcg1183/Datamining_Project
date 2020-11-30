@@ -151,15 +151,15 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        for k in range(2,6):
+                        for k in range(2, 6):
                             clusters = run_kbrain(k, algo, ds)
-                            exp.results[algo].append((ds.name, num, k, clusters))
+                            exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "k-medoid":
 
-                        for k in range(2,6):
+                        for k in range(2, 6):
                             clusters = run_kbrain(k, algo, ds)
-                            exp.results[algo].append((ds.name, num, k, clusters))
+                            exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "sklearn_kmeans":
                         for numClusters in range(1, 5):
@@ -274,21 +274,23 @@ def build_dataset(name):
 
     elif name == "blobs":
         new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
-    
+
     elif name == "random":
         # Fitting a pentagon in a square hole, needs updating asap
-        random = np.random.uniform(low=0.0, high=15.0, size=(200,2))
-        df = pd.DataFrame(columns = ['x1', 'x2'])
-        df.x1 = random[:,0]
-        df.x2 = random[:,1]
+        random = np.random.uniform(low=0.0, high=15.0, size=(200, 2))
+        df = pd.DataFrame(columns=["x1", "x2"])
+        df.x1 = random[:, 0]
+        df.x2 = random[:, 1]
         return df
-    
 
     # convert to dataframe
     df = pd.DataFrame(new_dataset[0], columns=["x1", "x2"])
 
     # add cluster labels to dataframe
     df["y"] = new_dataset[1]
+
+    return df
+
 
 def calculate_distances(exp):
     print("calculate_distances")
@@ -378,5 +380,6 @@ def run_parser():
         print("\tlist some datasets")
 
     return args
+
 
 main()

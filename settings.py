@@ -3,8 +3,8 @@ algorithms = [
     "sklearn_kmeans",
     "sklearn_kmedoids",
     "sklearn_dbscan",
-    "k-means",
-    "k-medoids",
+    # "k-means",
+    # "k-medoids",
 ]
 
 datasetTypes = ["circles", "moons", "blobs"]  # , "random"]
