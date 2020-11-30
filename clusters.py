@@ -155,7 +155,7 @@ def run_experiment(exp):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
-                    if algo == "k-medoid":
+                    if algo == "k-medoids":
 
                         for k in range(2, 6):
                             clusters = run_kbrain(k, algo, ds)
