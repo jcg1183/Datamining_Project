@@ -1,9 +1,14 @@
-algorithms = ["DBSCAN"]  # , "k-means", "k-medoids"]
+algorithms = [
+    "DBSCAN",
+    "sklearn_kmeans",
+    "sklearn_kmedoids",
+    "sklearn_dbscan",
+]  # , "k-means", "k-medoids"]
 
 datasetTypes = ["circles", "moons", "blobs"]  # , "random"]
 
-maxSamples = 500
-numSamples = [500]  # , 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500]
+maxSamples = 100
+numSamples = [100]  # , 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500]
 
 numRuns = 5
 

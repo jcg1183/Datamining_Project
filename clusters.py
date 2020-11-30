@@ -10,6 +10,7 @@ from sklearn import datasets
 import time
 import math
 import numpy as np
+from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
 
 
 def main():
@@ -43,7 +44,7 @@ def main():
         print()
 
     # process results here
-    analyze_results(exp)
+    print_results(exp)
 
 
 # replace this comment with proper formater
@@ -74,7 +75,9 @@ def run_experiment(exp):
                                 results = dbscan(ds, num, eps, mp)
 
                                 # save results of each experiment
-                                exp.results[algo].append((ds.name, num, i, results))
+                                exp.results[algo].append(
+                                    (ds.name, num, i, eps, mp, results)
+                                )
 
                     if algo == "k-means":
 
@@ -86,22 +89,75 @@ def run_experiment(exp):
                         # call k-medoid and save results here
                         print()
 
+                    if algo == "sklearn_kmeans":
+                        for numClusters in range(1, 5):
+                            results = sklearn_kmeans(ds, numClusters, num)
 
-def analyze_results(exp):
+                            exp.results[algo].append(
+                                (ds.name, num, i, numClusters, results)
+                            )
+
+                    if algo == "sklearn_kmedoids":
+                        for numClusters in range(1, 5):
+                            results = sklearn_kmedoids(ds, numClusters, num)
+
+                            exp.results[algo].append(
+                                (ds.name, num, i, numClusters, results)
+                            )
+
+                    if algo == "sklearn_dbscan":
+                        # loop parameters unique to dbscan
+                        for eps in settings.epsilons:
+                            for mp in settings.minPts:
+
+                                # call dbscan with parameters
+                                results = sklearn_dbscan(ds, num, eps, mp)
+
+                                # save results of each experiment
+                                exp.results[algo].append(
+                                    (ds.name, num, i, eps, mp, results)
+                                )
+
+
+def print_results(exp):
     print("Analyse Results\n")
 
     for algo in exp.results.keys():
-        if algo == "DBSCAN":
+        if algo == "DBSCAN" or algo == "sklearn_dbscan":
             all_results = exp.results[algo]
 
             for results in all_results:
                 print(
-                    "Experiment:\n\tAlgorithm: {0}\n\tNum Datapoints: {1}\n\tTrial Number: {2}".format(
-                        results[0], results[1], results[2]
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tEpsilon: {4}\n\tMin Points: {5}".format(
+                        algo, results[0], results[1], results[2], results[3], results[4]
                     )
                 )
                 print("Cluster Assignments:\n")
-                print(results[3])
+                print(results[5])
+
+        elif algo == "sklearn_kmeans":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tNumber Clusters: {4}".format(
+                        algo, results[0], results[1], results[2], results[3]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[4])
+
+        elif algo == "sklearn_kmedoids":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tNumber Clusters: {4}".format(
+                        algo, results[0], results[1], results[2], results[3]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[4])
 
 
 # add appropriate comments
