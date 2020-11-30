@@ -384,6 +384,3 @@ def run_parser():
         print("\tlist some datasets")
 
     return args
-
-
-main()
