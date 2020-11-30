@@ -12,6 +12,11 @@ import math
 import numpy as np
 from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
 
+# display all columns of a dataframe
+pd.set_option("display.max_columns", None)
+pd.set_option("expand_frame_repr", False)
+pd.set_option("display.max_rows", None)
+
 
 def main():
     # process command line arguments and return arguments as args
@@ -44,7 +49,71 @@ def main():
         print()
 
     # process results here
-    print_results(exp)
+    # print_results(exp)
+
+    # compile results into a dataframe
+    resultsDF = compile_results(exp)
+
+    print(resultsDF.drop(columns=["cluster_list"]))
+
+
+def compile_results(exp):
+    resultsDF = pd.DataFrame(
+        columns=[
+            "algo",
+            "dataset_type",
+            "num_pts",
+            "trial_num",
+            "epsilon",
+            "min_pts",
+            "k",
+            "accuracy",
+            "dataset",
+            "cluster_list",
+        ]
+    )
+
+    # dbscan ds.name, num, i, eps, mp, results
+    # kmeans/kmedoid ds.name, num, i, numClusters, results
+    for algo in exp.results.keys():
+        if algo == "DBSCAN" or algo == "sklearn_dbscan":
+            for result in exp.results[algo]:
+                resultsDF = resultsDF.append(
+                    {
+                        "algo": algo,
+                        "dataset_type": result[0],
+                        "num_pts": result[1],
+                        "trial_num": result[2],
+                        "epsilon": result[3],
+                        "min_pts": result[4],
+                        "k": -1,
+                        "accuracy": -1,
+                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
+                        "cluster_list": result[5],
+                    },
+                    ignore_index=True,
+                )
+        else:
+            for result in exp.results[algo]:
+                # kmeans/kmedoid ds.name, num, i, numClusters, results
+
+                resultsDF = resultsDF.append(
+                    {
+                        "algo": algo,
+                        "dataset_type": result[0],
+                        "num_pts": result[1],
+                        "trial_num": result[2],
+                        "epsilon": -1,
+                        "min_pts": -1,
+                        "k": result[3],
+                        "accuracy": -1,
+                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
+                        "cluster_list": result[4],
+                    },
+                    ignore_index=True,
+                )
+
+    return resultsDF
 
 
 # replace this comment with proper formater
@@ -82,6 +151,9 @@ def run_experiment(exp):
                     if algo == "k-means":
 
                         # call k-means and save results here
+                        # append the results as a tuple like comment below
+                        # results should be a dataframe with one column, "cluster"
+                        # (ds.name, num, i, numClusters, results)
                         print()
 
                     if algo == "k-medoid":
