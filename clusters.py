@@ -5,9 +5,10 @@ import sys
 import settings
 from objects import experiment, dataset
 from dbscan import dbscan
-from KBRAIN import run_kbrain
+from KBRAIN import run_kbrain, autoplot
 import pandas as pd
 from sklearn import datasets
+from sklearn.metrics import silhouette_score, pairwise_distances
 import time
 import math
 import numpy as np
@@ -143,7 +144,6 @@ def run_experiment(exp):
 
                                 # call dbscan with parameters
                                 results = dbscan(ds, num, eps, mp)
-
                                 # save results of each experiment
                                 exp.results[algo].append(
                                     (ds.name, num, i, eps, mp, results)
@@ -151,18 +151,18 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        for k in range(1, 5):
+                        for k in range(2, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "k-medoids":
 
-                        for k in range(1, 5):
+                        for k in range(2, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "sklearn_kmeans":
-                        for numClusters in range(1, 5):
+                        for numClusters in range(2, 5):
                             results = sklearn_kmeans(ds, numClusters, num)
 
                             exp.results[algo].append(
@@ -170,7 +170,7 @@ def run_experiment(exp):
                             )
 
                     if algo == "sklearn_kmedoids":
-                        for numClusters in range(1, 5):
+                        for numClusters in range(2, 5):
                             results = sklearn_kmedoids(ds, numClusters, num)
 
                             exp.results[algo].append(
