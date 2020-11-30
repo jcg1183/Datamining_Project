@@ -282,8 +282,8 @@ def build_dataset(name):
     df["y"] = new_dataset[1]
 
     # print functions can be deleted once finished
-    print("{0} dataset generated".format(name))
-    print(df.head(5))
+    # print("{0} dataset generated".format(name))
+    # print(df.head(5))
 
     return df
 
@@ -316,8 +316,8 @@ def calculate_distances(exp):
         getDistancesTimeStop = time.perf_counter()
 
         print(
-            "get_distances time: {0:5.4}\n".format(
-                (getDistancesTimeStop - getDistancesTimeStart) * 100
+            "{0} get_distances time: {1:5.4}".format(
+                ds.name, (getDistancesTimeStop - getDistancesTimeStart) * 100
             )
         )
 

@@ -18,11 +18,11 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
     count_neighbors(df, ds.distanceArray[:numSamples, :numSamples], epsilon)
 
-    print(
-        "Running DBSCAN:\n\tnumSamples: {0}\n\tepsilon: {1}\n\tminPts: {2}".format(
-            numSamples, epsilon, minPts
-        )
-    )
+    # print(
+    #    "Running DBSCAN:\n\tnumSamples: {0}\n\tepsilon: {1}\n\tminPts: {2}".format(
+    #        numSamples, epsilon, minPts
+    #    )
+    # )
 
     dbscanTimeStart = time.perf_counter()
 
@@ -64,11 +64,11 @@ def dbscan(ds, numSamples, epsilon, minPts):
 
         clusterCount += 1
 
-    print("Finished")
+    # print("Finished")
 
     dbscanTimeStop = time.perf_counter()
 
-    print("dbscan time: {0:5.4}\n".format((dbscanTimeStop - dbscanTimeStart) * 100))
+    # print("dbscan time: {0:5.4}\n".format((dbscanTimeStop - dbscanTimeStart) * 100))
 
     return pd.DataFrame(df["cluster"], columns=["cluster"])
 
