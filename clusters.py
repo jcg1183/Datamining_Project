@@ -11,6 +11,12 @@ from sklearn import datasets
 import time
 import math
 import numpy as np
+from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
+
+# display all columns of a dataframe
+pd.set_option("display.max_columns", None)
+pd.set_option("expand_frame_repr", False)
+pd.set_option("display.max_rows", None)
 
 
 def main():
@@ -44,6 +50,71 @@ def main():
         print()
 
     # process results here
+    # print_results(exp)
+
+    # compile results into a dataframe
+    resultsDF = compile_results(exp)
+
+    print(resultsDF.drop(columns=["cluster_list"]))
+
+
+def compile_results(exp):
+    resultsDF = pd.DataFrame(
+        columns=[
+            "algo",
+            "dataset_type",
+            "num_pts",
+            "trial_num",
+            "epsilon",
+            "min_pts",
+            "k",
+            "accuracy",
+            "dataset",
+            "cluster_list",
+        ]
+    )
+
+    # dbscan ds.name, num, i, eps, mp, results
+    # kmeans/kmedoid ds.name, num, i, numClusters, results
+    for algo in exp.results.keys():
+        if algo == "DBSCAN" or algo == "sklearn_dbscan":
+            for result in exp.results[algo]:
+                resultsDF = resultsDF.append(
+                    {
+                        "algo": algo,
+                        "dataset_type": result[0],
+                        "num_pts": result[1],
+                        "trial_num": result[2],
+                        "epsilon": result[3],
+                        "min_pts": result[4],
+                        "k": -1,
+                        "accuracy": -1,
+                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
+                        "cluster_list": result[5],
+                    },
+                    ignore_index=True,
+                )
+        else:
+            for result in exp.results[algo]:
+                # kmeans/kmedoid ds.name, num, i, numClusters, results
+
+                resultsDF = resultsDF.append(
+                    {
+                        "algo": algo,
+                        "dataset_type": result[0],
+                        "num_pts": result[1],
+                        "trial_num": result[2],
+                        "epsilon": -1,
+                        "min_pts": -1,
+                        "k": result[3],
+                        "accuracy": -1,
+                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
+                        "cluster_list": result[4],
+                    },
+                    ignore_index=True,
+                )
+
+    return resultsDF
 
 
 # replace this comment with proper formater
@@ -74,19 +145,97 @@ def run_experiment(exp):
                                 results = dbscan(ds, num, eps, mp)
 
                                 # save results of each experiment
-                                exp.results[algo].append(ds.name, num, i, results)
+                                exp.results[algo].append(
+                                    (ds.name, num, i, eps, mp, results)
+                                )
 
                     if algo == "k-means":
 
+
                         for k in range(2,6):
                             labels, centroids = run_kbrain(k, algo, ds.df)
-                            #exp.results[algo].append(ds.name, num, k, labels, centroids)
+                            exp.results[algo].append((ds.name, num, k, labels, centroids)) # run_kbrain needs to be updated
+                            
+                        # call k-means and save results here
+                        # append the results as a tuple like comment below
+                        # results should be a dataframe with one column, "cluster"
+                        # (ds.name, num, i, numClusters, results)
 
                     if algo == "k-medoid":
 
                         for k in range(2,6):
                             labels, medoids = run_kbrain(k, algo, ds.df)
-                            #exp.results[algo].append(ds.name, num, k, labels, medoids)
+                            exp.results[algo].append((ds.name, num, k, labels, medoids))
+
+                    if algo == "sklearn_kmeans":
+                        for numClusters in range(1, 5):
+                            results = sklearn_kmeans(ds, numClusters, num)
+
+                            exp.results[algo].append(
+                                (ds.name, num, i, numClusters, results)
+                            )
+
+                    if algo == "sklearn_kmedoids":
+                        for numClusters in range(1, 5):
+                            results = sklearn_kmedoids(ds, numClusters, num)
+
+                            exp.results[algo].append(
+                                (ds.name, num, i, numClusters, results)
+                            )
+
+                    if algo == "sklearn_dbscan":
+                        # loop parameters unique to dbscan
+                        for eps in settings.epsilons:
+                            for mp in settings.minPts:
+
+                                # call dbscan with parameters
+                                results = sklearn_dbscan(ds, num, eps, mp)
+
+                                # save results of each experiment
+                                exp.results[algo].append(
+                                    (ds.name, num, i, eps, mp, results)
+                                )
+
+
+def print_results(exp):
+    print("Analyse Results\n")
+
+    for algo in exp.results.keys():
+        if algo == "DBSCAN" or algo == "sklearn_dbscan":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tEpsilon: {4}\n\tMin Points: {5}".format(
+                        algo, results[0], results[1], results[2], results[3], results[4]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[5])
+
+        elif algo == "sklearn_kmeans":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tNumber Clusters: {4}".format(
+                        algo, results[0], results[1], results[2], results[3]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[4])
+
+        elif algo == "sklearn_kmedoids":
+            all_results = exp.results[algo]
+
+            for results in all_results:
+                print(
+                    "Experiment:\n\tAlgorithm: {0}\n\tDataset Name: {1}\n\tNum Datapoints: {2}\n\tTrial Number: {3}\n\tNumber Clusters: {4}".format(
+                        algo, results[0], results[1], results[2], results[3]
+                    )
+                )
+                print("Cluster Assignments:\n")
+                print(results[4])
 
 
 # add appropriate comments
@@ -122,31 +271,30 @@ def build_dataset(name):
 
     # generate sklearn circles dataset
     if name == "circles":
-        noisy_circles = datasets.make_circles(
-            n_samples=2500, factor=0.5, noise=0.05
+        new_dataset = datasets.make_circles(
+            n_samples=settings.maxSamples, factor=0.5, noise=0.05
         )
 
-        # convert to dataframe
-        df = pd.DataFrame(noisy_circles[0], columns=["x1", "x2"])
+    elif name == "moons":
+        new_dataset = datasets.make_moons(n_samples=settings.maxSamples, noise=0.05)
 
-        # add cluster labels to dataframe
-        df["y"] = noisy_circles[1]
-
-        # print functions can be deleted once finished
-        print("circles dataset generated")
-        print(df.head(5))
-        
-    if name == "random":
+    elif name == "blobs":
+        new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
+    
+    elif name == "random":
+        # Fitting a pentagon in a square hole, needs updating asap
         random = np.random.uniform(low=0.0, high=15.0, size=(200,2))
         df = pd.DataFrame(columns = ['x1', 'x2'])
         df.x1 = random[:,0]
         df.x2 = random[:,1]
-        
-        print("random dataset generated")
-        print(df.head(5))
+        return df
+    
 
-    return df
+    # convert to dataframe
+    df = pd.DataFrame(new_dataset[0], columns=["x1", "x2"])
 
+    # add cluster labels to dataframe
+    df["y"] = new_dataset[1]
 
 def calculate_distances(exp):
     print("calculate_distances")
@@ -176,8 +324,8 @@ def calculate_distances(exp):
         getDistancesTimeStop = time.perf_counter()
 
         print(
-            "get_distances time: {0:5.4}\n".format(
-                (getDistancesTimeStop - getDistancesTimeStart) * 100
+            "{0} get_distances time: {1:5.4}".format(
+                ds.name, (getDistancesTimeStop - getDistancesTimeStart) * 100
             )
         )
 
