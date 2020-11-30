@@ -14,9 +14,9 @@ def run_kbrain(k, algorithm, data):
     
     initial_centers = generate_random_centers(k, data.df)
     
-    label, centers = generate_clusters(k, data.df, initial_centers, algorithm)
+    label, centers = generate_clusters(k, data, initial_centers, algorithm)
     
-    #autoplot(k, data, return_centers, return_label, algorithm)
+    #autoplot(k, data.df, centers, label, algorithm)
     
     return_df['clusters'] = label
     
@@ -52,7 +52,7 @@ def kmean(k, clusters, labels):
     for n in range(0,k):
         
         # Calculate the mean
-        temp = np.mean(clusters[labels == n])
+        temp = np.mean(clusters.df[labels == n])
         
         # Append the new centroid to the return array
         return_centroids.append(temp.values)
@@ -71,13 +71,13 @@ def kmedoid(k, clusters, medoids, labels):
     
     # For cluster n of k...
     for n in range(0,k):
-        length = len(clusters[labels == n])
+        length = len(clusters.df[labels == n])
         
         # Iterate through every point of each cluster
         i = length - 1
         
         # Save the cluster once, use it a lot
-        cluster = clusters[labels == n].copy()
+        cluster = clusters.df[labels == n]
         while i >= 0:
             temp = 0
             
@@ -86,7 +86,7 @@ def kmedoid(k, clusters, medoids, labels):
                 
                 # Calculate the total distance from all points to the
                 # prospective medoid
-                temp += euclidean_distance(cluster.iloc[m], cluster.iloc[i])
+                temp += clusters.distanceArray[cluster.index[m], cluster.index[i]]
             
             # If the prospective medoid has lower entropy than the current
             if temp < distances[n]:
@@ -152,7 +152,7 @@ def generate_random_centers(k, df):
 
 def generate_clusters(k, points, centers, algorithm):
     # Function returns a list of cluster labels
-    length = len(points)
+    length = len(points.df)
     return_labels = np.empty(length)
     
     # Base cases
@@ -180,7 +180,7 @@ def generate_clusters(k, points, centers, algorithm):
                     
                     # Calculate the euclidean distance between point n
                     # and center m
-                    newDist = euclidean_distance(points.iloc[n], centers[m])
+                    newDist = euclidean_distance(points.df.iloc[n], centers[m])
                     
                     # If the new distance is less than the current distance...
                     if newDist < currentDist:
@@ -195,7 +195,7 @@ def generate_clusters(k, points, centers, algorithm):
             if algorithm == "k-means":
                 new_centers = kmean(k, points, return_labels)
                 
-            elif algorithm == "k-medoid":
+            elif algorithm == "k-medoids":
                 new_centers = kmedoid(k, points, centers, return_labels)
             
             else:
