@@ -35,3 +35,5 @@ class dataset:
         self.name = name
         self.df = df
         self.distanceArray = 0
+    def __str__(self):
+        return hex(id(self))
