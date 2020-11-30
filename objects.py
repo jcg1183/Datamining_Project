@@ -1,6 +1,6 @@
 import settings
 from dbscan import dbscan
-from clustering import KBRAIN
+import KBRAIN
 
 
 class experiment:
