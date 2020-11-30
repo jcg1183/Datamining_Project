@@ -151,21 +151,15 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-
                         for k in range(2,6):
-                            labels, centroids = run_kbrain(k, algo, ds.df)
-                            exp.results[algo].append((ds.name, num, k, labels, centroids)) # run_kbrain needs to be updated
-                            
-                        # call k-means and save results here
-                        # append the results as a tuple like comment below
-                        # results should be a dataframe with one column, "cluster"
-                        # (ds.name, num, i, numClusters, results)
+                            clusters = run_kbrain(k, algo, ds)
+                            exp.results[algo].append((ds.name, num, k, clusters))
 
                     if algo == "k-medoid":
 
                         for k in range(2,6):
-                            labels, medoids = run_kbrain(k, algo, ds.df)
-                            exp.results[algo].append((ds.name, num, k, labels, medoids))
+                            clusters = run_kbrain(k, algo, ds)
+                            exp.results[algo].append((ds.name, num, k, clusters))
 
                     if algo == "sklearn_kmeans":
                         for numClusters in range(1, 5):
@@ -384,3 +378,5 @@ def run_parser():
         print("\tlist some datasets")
 
     return args
+
+main()

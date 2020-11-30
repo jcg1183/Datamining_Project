@@ -6,19 +6,21 @@ import math
 import matplotlib.pyplot as plt
 
 def run_kbrain(k, algorithm, data):
-    return_label = []
-    return_centers = []
+    
+    return_df = pd.DataFrame()
     
     #if data == None:
     #    data = generate_random_dataset()
     
-    initial_centers = generate_random_centers(k, data)
+    initial_centers = generate_random_centers(k, data.df)
     
-    return_label, return_centers = generate_clusters(k, data, initial_centers, algorithm)
+    label, centers = generate_clusters(k, data.df, initial_centers, algorithm)
     
-    autoplot(k, data, return_centers, return_label, algorithm)
+    #autoplot(k, data, return_centers, return_label, algorithm)
     
-    return return_label, return_centers
+    return_df['clusters'] = label
+    
+    return return_df
 
 def autoplot(k, df, centers, labels, alg):
     # NOTE: Only works for two dimensions currently
