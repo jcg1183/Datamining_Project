@@ -30,7 +30,7 @@ def main():
     exp = experiment(datasets, settings.algorithms)
 
     # calculate distances for each dataset
-    # calculate_distances(exp)
+    calculate_distances(exp)
 
     # run an experiment with all algorithms and datasets
     if args.experiment:
@@ -129,7 +129,7 @@ def run_experiment(exp):
 
             # loop through the number of datapoints
             # to be used
-            for num in range(0,1):#settings.numSamples:
+            for num in settings.numSamples:
 
                 # loop for each trial run
                 for i in range(1, settings.numRuns + 1):
