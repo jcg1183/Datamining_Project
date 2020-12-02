@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
+# python libraries
 import argparse
 import math
 import sys
 import time
 
+# program imports
 import settings
 from objects import experiment, dataset
 from dataprep import calculate_distances, build_dataset, ready_datasets
@@ -14,6 +16,7 @@ from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
 from metrics import calculate_groundtruth_accuracy, calculate_sklearn_accuracy
 from results_analysis import save_results, compile_results
 
+# data libraries
 import numpy as np
 import pandas as pd
 from sklearn import datasets
@@ -56,16 +59,17 @@ def main():
         # call dbscan wrapper function
         print()
 
-    # process results here
-    # print_results(exp)
-
     # compile results into a dataframe
     resultsDF = compile_results(exp)
 
     # print(resultsDF.drop(columns=["cluster_list"]))
 
+    # calculate accuracy of our clustering algorithms' results
+    # compared to sklearn.dataset dataset labels
     calculate_groundtruth_accuracy(resultsDF, exp)
 
+    # calculate accuracy of our clustering algorithms' results
+    # compared to sklearn clustering algorithm labels
     calculate_sklearn_accuracy(resultsDF, exp)
 
     print(resultsDF.drop(columns=["cluster_list", "dataset"]))
@@ -73,9 +77,15 @@ def main():
     save_results(resultsDF)
 
 
-# replace this comment with proper formater
-# this function takes an experiment and runs
-# all specified permutations of the parameters
+# ***************************************************************
+# Function:         run_experiment
+# Variables/input:  objects.exp
+# Output:           appends results to objects.exp
+# Usage/Purpose:    Function loops through all permutations of
+#                   algorithm parameters.
+# ***************************************************************
+
+
 def run_experiment(exp):
     # loop through each clustering algorithm
     for algo in exp.algorithms:
@@ -155,6 +165,13 @@ def run_experiment(exp):
                     print(" {0:3.2} minutes".format((stopTime - startTime) / 60))
 
 
+# ***************************************************************
+# Function:         print_results
+# Variables/input:  objects.exp
+# Output:           prints to screen
+# Usage/Purpose:    Function pretty prints an experiment object
+#                   to the screen.
+# ***************************************************************
 def print_results(exp):
     print("Analyse Results\n")
 
@@ -196,12 +213,14 @@ def print_results(exp):
                 print(results[4])
 
 
-# add formatted comments
-# this function uses 'argparse' library to parse
-# command line arguments
-# this function will terminate program if inappropriate
-# arguments are given
-# more checks of arguments need to be coded
+# ***************************************************************
+# Function:         run_parser
+# Variables/input:  none
+# Output:           argparse.arguments object
+# Usage/Purpose:    Function checks command line arguments for
+#                   correct state and returns an object with
+#                   argument values.
+# ***************************************************************
 def run_parser():
     parser = argparse.ArgumentParser()
 
