@@ -56,7 +56,147 @@ def main():
     # compile results into a dataframe
     resultsDF = compile_results(exp)
 
-    print(resultsDF.drop(columns=["cluster_list"]))
+    # print(resultsDF.drop(columns=["cluster_list"]))
+
+    calculate_groundtruth_accuracy(resultsDF, exp)
+
+    calculate_sklearn_accuracy(resultsDF, exp)
+
+    print(resultsDF.drop(columns=["cluster_list", "dataset"]))
+
+    save_results(resultsDF)
+
+
+def save_results(resultsDF):
+    resultsDF.drop(["cluster_list", "dataset"], axis=1).to_csv(
+        r"results.csv", index=False
+    )
+
+
+def calculate_sklearn_accuracy(resultsDF, exp):
+    resultsDF["sklearn_accuracy"] = -1
+
+    for i in range(resultsDF.shape[0]):
+        algo = resultsDF.iloc[i]["algo"]
+
+        if algo not in settings.algorithm_pairs.keys():
+            continue
+
+        datasetType = resultsDF.iloc[i]["dataset_type"]
+        numPts = resultsDF.iloc[i]["num_pts"]
+        trialNum = resultsDF.iloc[i]["trial_num"]
+        epsilon = resultsDF.iloc[i]["epsilon"]
+        minPts = resultsDF.iloc[i]["min_pts"]
+        k = resultsDF.iloc[i]["k"]
+
+        skRowIndex = resultsDF.index[
+            (resultsDF["algo"] == settings.algorithm_pairs[algo])
+            & (resultsDF["dataset_type"] == datasetType)
+            & (resultsDF["num_pts"] == numPts)
+            & (resultsDF["trial_num"] == trialNum)
+            & (resultsDF["epsilon"] == epsilon)
+            & (resultsDF["min_pts"] == minPts)
+            & (resultsDF["k"] == k)
+        ]
+
+        skRow = resultsDF.iloc[skRowIndex[0]]
+
+        resultsDF.loc[
+            resultsDF.index.values == i, "sklearn_accuracy"
+        ] = calculate_accuracy(
+            numPts=resultsDF.iloc[i]["num_pts"],
+            sk=skRow["cluster_list"],
+            cl=resultsDF.iloc[i]["cluster_list"],
+        )
+
+
+def calculate_groundtruth_accuracy(resultsDF, exp):
+    resultsDF["accuracy"] = -1
+
+    for i in range(resultsDF.shape[0]):
+        resultsDF.loc[resultsDF.index.values == i, "accuracy"] = calculate_accuracy(
+            numPts=resultsDF.iloc[i]["num_pts"],
+            ds=resultsDF.iloc[i]["dataset"],
+            cl=resultsDF.iloc[i]["cluster_list"],
+        )
+
+
+def calculate_accuracy(numPts=0, ds=None, sk=None, cl=None):
+    gtClusters = 0
+    ourClusters = 0
+
+    # print("ds: {0}\nsk: {1}\ncl: {2}".format(type(ds), type(sk), type(cl)))
+
+    # if parameters is type 'dataset' object
+    if ds is not None:
+        gtClusters = ds.df["y"]
+        gtClusters = gtClusters[:numPts].values
+
+    elif sk is not None:
+        gtClusters = sk["cluster"].tolist()
+
+    ourClusters = cl["cluster"].tolist()
+
+    # print(type(ourClusters))
+    # print(type(gtClusters))
+
+    gtSetDict = {}
+    ourSetDict = {}
+
+    for i in range(len(gtClusters)):
+        clust = gtClusters[i]
+
+        if clust in gtSetDict.keys():
+            gtSetDict[clust].add(i)
+        else:
+            gtSetDict[clust] = set([i])
+
+    for i in range(len(ourClusters)):
+        clust = ourClusters[i]
+
+        if clust in ourSetDict.keys():
+            ourSetDict[clust].add(i)
+        else:
+            ourSetDict[clust] = set([i])
+
+    setMatrix = np.zeros([len(gtSetDict.keys()), len(ourSetDict.keys())])
+
+    imap = list(gtSetDict.keys())
+    jmap = list(ourSetDict.keys())
+
+    for i in range(setMatrix.shape[0]):
+        for j in range(setMatrix.shape[1]):
+
+            gtSet = gtSetDict[imap[i]]
+            ourSet = ourSetDict[jmap[j]]
+
+            setMatrix[i][j] = float(len(gtSet & ourSet)) / len(gtSet)
+
+    clusterMap = {}
+
+    for i in range(setMatrix.shape[0]):
+        jBest = setMatrix[i][0]
+        jIndex = 0
+
+        for j in range(setMatrix.shape[1]):
+            if setMatrix[i][j] > jBest:
+                jBest = setMatrix[i][j]
+                jIndex = j
+
+        clusterMap[i] = jmap[jIndex]
+
+    accuracy = 0
+    totalRight = 0
+
+    for i in range(setMatrix.shape[0]):
+        gtSet = gtSetDict[imap[i]]
+        ourSet = ourSetDict[clusterMap[i]]
+
+        totalRight += len(gtSet & ourSet)
+
+    accuracy = float(totalRight) / numPts
+
+    return accuracy
 
 
 def compile_results(exp):
@@ -69,7 +209,6 @@ def compile_results(exp):
             "epsilon",
             "min_pts",
             "k",
-            "accuracy",
             "dataset",
             "cluster_list",
         ]
@@ -89,7 +228,6 @@ def compile_results(exp):
                         "epsilon": result[3],
                         "min_pts": result[4],
                         "k": -1,
-                        "accuracy": -1,
                         "dataset": next(x for x in exp.datasets if x.name == result[0]),
                         "cluster_list": result[5],
                     },
@@ -108,7 +246,6 @@ def compile_results(exp):
                         "epsilon": -1,
                         "min_pts": -1,
                         "k": result[3],
-                        "accuracy": -1,
                         "dataset": next(x for x in exp.datasets if x.name == result[0]),
                         "cluster_list": result[4],
                     },
@@ -134,6 +271,11 @@ def run_experiment(exp):
 
                 # loop for each trial run
                 for i in range(1, settings.numRuns + 1):
+                    print(
+                        "algo: {0}, ds: {1}, size: {2}".format(algo, ds.name, num),
+                        end="",
+                    )
+                    startTime = time.perf_counter()
 
                     # call dbscan with parameters
                     if algo == "DBSCAN":
@@ -151,18 +293,18 @@ def run_experiment(exp):
 
                     if algo == "k-means":
 
-                        for k in range(2, 5):
+                        for k in range(3, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "k-medoids":
 
-                        for k in range(2, 5):
+                        for k in range(3, 5):
                             clusters = run_kbrain(k, algo, ds)
                             exp.results[algo].append((ds.name, num, i, k, clusters))
 
                     if algo == "sklearn_kmeans":
-                        for numClusters in range(2, 5):
+                        for numClusters in range(3, 5):
                             results = sklearn_kmeans(ds, numClusters, num)
 
                             exp.results[algo].append(
@@ -170,7 +312,7 @@ def run_experiment(exp):
                             )
 
                     if algo == "sklearn_kmedoids":
-                        for numClusters in range(2, 5):
+                        for numClusters in range(3, 5):
                             results = sklearn_kmedoids(ds, numClusters, num)
 
                             exp.results[algo].append(
@@ -189,6 +331,10 @@ def run_experiment(exp):
                                 exp.results[algo].append(
                                     (ds.name, num, i, eps, mp, results)
                                 )
+
+                    stopTime = time.perf_counter()
+
+                    print(" {0:3.2} minutes".format((stopTime - startTime) / 60))
 
 
 def print_results(exp):
