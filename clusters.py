@@ -1,18 +1,24 @@
 #!/usr/bin/env python
 
 import argparse
+import math
 import sys
+import time
+
 import settings
 from objects import experiment, dataset
+from dataprep import calculate_distances, build_dataset, ready_datasets
 from dbscan import dbscan
 from KBRAIN import run_kbrain, autoplot
+from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
+from metrics import calculate_groundtruth_accuracy, calculate_sklearn_accuracy
+from results_analysis import save_results, compile_results
+
+import numpy as np
 import pandas as pd
 from sklearn import datasets
 from sklearn.metrics import silhouette_score, pairwise_distances
-import time
-import math
-import numpy as np
-from sklearn_algs import sklearn_kmeans, sklearn_kmedoids, sklearn_dbscan
+
 
 # display all columns of a dataframe
 pd.set_option("display.max_columns", None)
@@ -65,194 +71,6 @@ def main():
     print(resultsDF.drop(columns=["cluster_list", "dataset"]))
 
     save_results(resultsDF)
-
-
-def save_results(resultsDF):
-    resultsDF.drop(["cluster_list", "dataset"], axis=1).to_csv(
-        r"results.csv", index=False
-    )
-
-
-def calculate_sklearn_accuracy(resultsDF, exp):
-    resultsDF["sklearn_accuracy"] = -1
-
-    for i in range(resultsDF.shape[0]):
-        algo = resultsDF.iloc[i]["algo"]
-
-        if algo not in settings.algorithm_pairs.keys():
-            continue
-
-        datasetType = resultsDF.iloc[i]["dataset_type"]
-        numPts = resultsDF.iloc[i]["num_pts"]
-        trialNum = resultsDF.iloc[i]["trial_num"]
-        epsilon = resultsDF.iloc[i]["epsilon"]
-        minPts = resultsDF.iloc[i]["min_pts"]
-        k = resultsDF.iloc[i]["k"]
-
-        skRowIndex = resultsDF.index[
-            (resultsDF["algo"] == settings.algorithm_pairs[algo])
-            & (resultsDF["dataset_type"] == datasetType)
-            & (resultsDF["num_pts"] == numPts)
-            & (resultsDF["trial_num"] == trialNum)
-            & (resultsDF["epsilon"] == epsilon)
-            & (resultsDF["min_pts"] == minPts)
-            & (resultsDF["k"] == k)
-        ]
-
-        skRow = resultsDF.iloc[skRowIndex[0]]
-
-        resultsDF.loc[
-            resultsDF.index.values == i, "sklearn_accuracy"
-        ] = calculate_accuracy(
-            numPts=resultsDF.iloc[i]["num_pts"],
-            sk=skRow["cluster_list"],
-            cl=resultsDF.iloc[i]["cluster_list"],
-        )
-
-
-def calculate_groundtruth_accuracy(resultsDF, exp):
-    resultsDF["accuracy"] = -1
-
-    for i in range(resultsDF.shape[0]):
-        resultsDF.loc[resultsDF.index.values == i, "accuracy"] = calculate_accuracy(
-            numPts=resultsDF.iloc[i]["num_pts"],
-            ds=resultsDF.iloc[i]["dataset"],
-            cl=resultsDF.iloc[i]["cluster_list"],
-        )
-
-
-def calculate_accuracy(numPts=0, ds=None, sk=None, cl=None):
-    gtClusters = 0
-    ourClusters = 0
-
-    # print("ds: {0}\nsk: {1}\ncl: {2}".format(type(ds), type(sk), type(cl)))
-
-    # if parameters is type 'dataset' object
-    if ds is not None:
-        gtClusters = ds.df["y"]
-        gtClusters = gtClusters[:numPts].values
-
-    elif sk is not None:
-        gtClusters = sk["cluster"].tolist()
-
-    ourClusters = cl["cluster"].tolist()
-
-    # print(type(ourClusters))
-    # print(type(gtClusters))
-
-    gtSetDict = {}
-    ourSetDict = {}
-
-    for i in range(len(gtClusters)):
-        clust = gtClusters[i]
-
-        if clust in gtSetDict.keys():
-            gtSetDict[clust].add(i)
-        else:
-            gtSetDict[clust] = set([i])
-
-    for i in range(len(ourClusters)):
-        clust = ourClusters[i]
-
-        if clust in ourSetDict.keys():
-            ourSetDict[clust].add(i)
-        else:
-            ourSetDict[clust] = set([i])
-
-    setMatrix = np.zeros([len(gtSetDict.keys()), len(ourSetDict.keys())])
-
-    imap = list(gtSetDict.keys())
-    jmap = list(ourSetDict.keys())
-
-    for i in range(setMatrix.shape[0]):
-        for j in range(setMatrix.shape[1]):
-
-            gtSet = gtSetDict[imap[i]]
-            ourSet = ourSetDict[jmap[j]]
-
-            setMatrix[i][j] = float(len(gtSet & ourSet)) / len(gtSet)
-
-    clusterMap = {}
-
-    for i in range(setMatrix.shape[0]):
-        jBest = setMatrix[i][0]
-        jIndex = 0
-
-        for j in range(setMatrix.shape[1]):
-            if setMatrix[i][j] > jBest:
-                jBest = setMatrix[i][j]
-                jIndex = j
-
-        clusterMap[i] = jmap[jIndex]
-
-    accuracy = 0
-    totalRight = 0
-
-    for i in range(setMatrix.shape[0]):
-        gtSet = gtSetDict[imap[i]]
-        ourSet = ourSetDict[clusterMap[i]]
-
-        totalRight += len(gtSet & ourSet)
-
-    accuracy = float(totalRight) / numPts
-
-    return accuracy
-
-
-def compile_results(exp):
-    resultsDF = pd.DataFrame(
-        columns=[
-            "algo",
-            "dataset_type",
-            "num_pts",
-            "trial_num",
-            "epsilon",
-            "min_pts",
-            "k",
-            "dataset",
-            "cluster_list",
-        ]
-    )
-
-    # dbscan ds.name, num, i, eps, mp, results
-    # kmeans/kmedoid ds.name, num, i, numClusters, results
-    for algo in exp.results.keys():
-        if algo == "DBSCAN" or algo == "sklearn_dbscan":
-            for result in exp.results[algo]:
-                resultsDF = resultsDF.append(
-                    {
-                        "algo": algo,
-                        "dataset_type": result[0],
-                        "num_pts": result[1],
-                        "trial_num": result[2],
-                        "epsilon": result[3],
-                        "min_pts": result[4],
-                        "k": -1,
-                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
-                        "cluster_list": result[5],
-                    },
-                    ignore_index=True,
-                )
-        else:
-            for result in exp.results[algo]:
-                # kmeans/kmedoid ds.name, num, i, numClusters, results
-
-                resultsDF = resultsDF.append(
-                    {
-                        "algo": algo,
-                        "dataset_type": result[0],
-                        "num_pts": result[1],
-                        "trial_num": result[2],
-                        "epsilon": -1,
-                        "min_pts": -1,
-                        "k": result[3],
-                        "dataset": next(x for x in exp.datasets if x.name == result[0]),
-                        "cluster_list": result[4],
-                    },
-                    ignore_index=True,
-                )
-
-    return resultsDF
 
 
 # replace this comment with proper formater
@@ -376,100 +194,6 @@ def print_results(exp):
                 )
                 print("Cluster Assignments:\n")
                 print(results[4])
-
-
-# add appropriate comments
-# this function uses command line arguments to generate
-# datasets from csv or sklearn
-def ready_datasets(args):
-    datasetReturn = []
-
-    # load dataset from csv.  this has not been tested
-    # the csv part could be abstracted into another function
-    if args.dataset:
-        dfCSV = pd.read_csv(args.dataset, columns=["x1", "x2"])
-        datasetReturn.append(dataset(args.dataset, dfCSV))
-
-        print("dataset read from {0}".format(args.dataset))
-        print(dfCSV.head(5))
-
-    # loop through all sklearn dataset types and add a new
-    # dataset object to the return list
-    if args.generate:
-        for name in settings.datasetTypes:
-            datasetReturn.append(dataset(name, build_dataset(name)))
-
-    return datasetReturn
-
-
-# add formatted comments
-# function takes the name of an sklearn dataset type
-# and builds a dataframe dataset of that type
-def build_dataset(name):
-    # build all the dataset types here
-    df = pd.DataFrame()
-
-    # generate sklearn circles dataset
-    if name == "circles":
-        new_dataset = datasets.make_circles(
-            n_samples=settings.maxSamples, factor=0.5, noise=0.05
-        )
-
-    elif name == "moons":
-        new_dataset = datasets.make_moons(n_samples=settings.maxSamples, noise=0.05)
-
-    elif name == "blobs":
-        new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
-
-    elif name == "random":
-        # Fitting a pentagon in a square hole, needs updating asap
-        random = np.random.uniform(low=0.0, high=15.0, size=(200, 2))
-        df = pd.DataFrame(columns=["x1", "x2"])
-        df.x1 = random[:, 0]
-        df.x2 = random[:, 1]
-        return df
-
-    # convert to dataframe
-    df = pd.DataFrame(new_dataset[0], columns=["x1", "x2"])
-
-    # add cluster labels to dataframe
-    df["y"] = new_dataset[1]
-
-    return df
-
-
-def calculate_distances(exp):
-    print("calculate_distances")
-
-    for ds in exp.datasets:
-        df = ds.df
-
-        getDistancesTimeStart = time.perf_counter()
-
-        ds.distanceArray = np.zeros(
-            [settings.maxSamples, settings.maxSamples], dtype=float
-        )
-
-        for i in range(settings.maxSamples):
-            for j in range(i, settings.maxSamples):
-                if i == j:
-                    continue
-
-                distance = math.sqrt(
-                    math.pow(df.iloc[i]["x1"] - df.iloc[j]["x1"], 2)
-                    + math.pow(df.iloc[i]["x2"] - df.iloc[j]["x2"], 2)
-                )
-
-                ds.distanceArray[i, j] = distance
-                ds.distanceArray[j, i] = distance
-
-        getDistancesTimeStop = time.perf_counter()
-
-        print(
-            "{0} get_distances time: {1:5.4}".format(
-                ds.name, (getDistancesTimeStop - getDistancesTimeStart) * 100
-            )
-        )
 
 
 # add formatted comments

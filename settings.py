@@ -15,14 +15,14 @@ algorithm_pairs = {
 
 datasetTypes = ["circles", "moons", "blobs"]  # , "random"]
 
-maxSamples = 2500
-numSamples = [500, 1000, 1500, 2000, 2500]
+maxSamples = 100  # 2500
+numSamples = [100]  # [500, 1000, 1500, 2000, 2500]
 
 numRuns = 1
 
 # Parameters for DBSCAN
-epsilons = [0.25, 0.4, 0.5]
-minPts = [15, 30, 45]
+epsilons = [0.1]  # [0.25, 0.4, 0.5]
+minPts = [5]  # [15, 30, 45]
 
 description = {
     "k-means": "This is the description for k-means",

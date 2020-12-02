@@ -1,3 +1,5 @@
+*.csv
+
 # C-files
 a.out
 
