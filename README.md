@@ -37,15 +37,21 @@ The clusters.py script will call each algorithm and provide a results file with 
 ## User Manual
 
 Installation: Clone the repository to any directory of your choosing. All files (save for those which are archived) must be in the same directory for Bootleg Clusters to operate
+
 Operation: Bootleg Clusters is run from the command-line using clusters.py -> "python3 clusters.py [options]"
+
   There is a list of options to customize the execution:
+  
     '-d' or '--dataset' [path_to.csv]: specify a .csv file for clustering
     '-g' or '--generate': Generate all dataset types for clustering
     '-e' or '--experiment': Run all clustering algorithms on the datasets
     '-m' or '--kmeans': Run only the K-Means algorithm
     '-o' or '--kmedoids': Run only the K-Medoids algorithm
     '-s' or '--dbscan': Run only the DBSCAN algorithm
+    
   Upon completion, Bootleg Clusters will print the results of the experiment in the console, including the algorithm, options, dataset, and accuracy scores
+  
 Settings: Custom selection of dataset types, sample ranges, number of runs, and epsilons and minimum points (for DBSCAN) can be set within settings.py
+
   Note - Bootleg Clusters' completion time is dependent on the maxSamples variable in settings.py, the runtime complexity for calculating the distance matrix for each
   dataset is roughly O(2^n) per dataset where n is maxSamples.
