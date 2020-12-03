@@ -9,19 +9,28 @@ import pandas as pd
 from sklearn import datasets
 
 
-# add appropriate comments
-# this function uses command line arguments to generate
-# datasets from csv or sklearn
+# ***************************************************************
+# Function:         ready_datasets
+# Variables/input:  argparse.arguments object
+# Output:           python list containing objests.dataset
+# Usage/Purpose:    Function loads a dataset from a csv file
+#                   or generates datasets using sklearn.dataset.
+#                   CSV datasets are specified by command line
+#                   argument and sklearn datasets are specified
+#                   in settings.py.
+# ***************************************************************
 def ready_datasets(args):
     datasetReturn = []
 
     # load dataset from csv.  this has not been tested
     # the csv part could be abstracted into another function
     if args.dataset:
-        dfCSV = pd.read_csv(args.dataset, columns=["x1", "x2"])
-        datasetReturn.append(dataset(args.dataset, dfCSV))
+        dfCSV = pd.read_csv(args.dataset)
+        datasetReturn.append(dataset(args.dataset[2:-4], dfCSV))
 
-        print("dataset read from {0}".format(args.dataset))
+        settings.datasetTypes.insert(0, args.dataset[2:-4])
+
+        print("dataset read from {0}".format(args.dataset[2:-4]))
         print(dfCSV.head(5))
 
     # loop through all sklearn dataset types and add a new
@@ -33,14 +42,18 @@ def ready_datasets(args):
     return datasetReturn
 
 
-# add formatted comments
-# function takes the name of an sklearn dataset type
-# and builds a dataframe dataset of that type
+# ***************************************************************
+# Function:         build_dataset
+# Variables/input:  string: name
+# Output:           pandas dataframe
+# Usage/Purpose:    Function builds and returns specified
+#                   dataset.
+# ***************************************************************
 def build_dataset(name):
     # build all the dataset types here
     df = pd.DataFrame()
 
-    # generate sklearn circles dataset
+    # generate sklearn datasets
     if name == "circles":
         new_dataset = datasets.make_circles(
             n_samples=settings.maxSamples, factor=0.5, noise=0.05
@@ -52,6 +65,7 @@ def build_dataset(name):
     elif name == "blobs":
         new_dataset = datasets.make_blobs(n_samples=settings.maxSamples, random_state=1)
 
+    # random needs updating
     elif name == "random":
         # Fitting a pentagon in a square hole, needs updating asap
         random = np.random.uniform(low=0.0, high=15.0, size=(200, 2))
@@ -69,6 +83,13 @@ def build_dataset(name):
     return df
 
 
+# ***************************************************************
+# Function:         calculate_distances
+# Variables/input:  objects.exp
+# Output:           appends distance matrix to dataset
+# Usage/Purpose:    Function takes a dataset and creates a
+#                   distance matrix for that dataset.
+# ***************************************************************
 def calculate_distances(exp):
     print("calculate_distances")
 

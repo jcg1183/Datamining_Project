@@ -1,3 +1,5 @@
+# variable and parameters for experiment and clustering algorithms
+
 algorithms = [
     "DBSCAN",
     "sklearn_dbscan",
@@ -23,6 +25,8 @@ numRuns = 1
 # Parameters for DBSCAN
 epsilons = [0.1]  # [0.25, 0.4, 0.5]
 minPts = [5]  # [15, 30, 45]
+
+k = [2, 3, 4, 5]
 
 description = {
     "k-means": "This is the description for k-means",

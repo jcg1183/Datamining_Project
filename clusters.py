@@ -48,16 +48,36 @@ def main():
 
     # run k-means algorithm on specified datasets
     if args.kmeans:
-        # call k-means wrapper function
-        print()
+        clusters = run_kbrain(settings.k[0], "k-means", exp.datasets[0])
+        exp.results["k-means"].append(
+            (exp.datasets[0].name, settings.maxSamples, 1, settings.k[0], clusters)
+        )
 
     if args.kmedoids:
-        # call k-medoids wrapper function
-        print()
+        clusters = run_kbrain(settings.k[0], "k-medoids", exp.datasets[0])
+        exp.results["k-medoids"].append(
+            (exp.datasets[0].name, settings.maxSamples, 1, settings.k[0], clusters)
+        )
 
     if args.dbscan:
         # call dbscan wrapper function
-        print()
+        results = dbscan(
+            exp.datasets[0],
+            settings.maxSamples,
+            settings.epsilons[0],
+            settings.minPts[0],
+        )
+        # save results of each experiment
+        exp.results["DBSCAN"].append(
+            (
+                exp.datasets[0].name,
+                settings.maxSamples,
+                1,
+                settings.epsilons[0],
+                settings.minPts[0],
+                results,
+            )
+        )
 
     # compile results into a dataframe
     resultsDF = compile_results(exp)
@@ -70,7 +90,7 @@ def main():
 
     # calculate accuracy of our clustering algorithms' results
     # compared to sklearn clustering algorithm labels
-    calculate_sklearn_accuracy(resultsDF, exp)
+    # calculate_sklearn_accuracy(resultsDF, exp)
 
     print(resultsDF.drop(columns=["cluster_list", "dataset"]))
 
@@ -255,18 +275,30 @@ def run_parser():
         print("Choose one of the following:")
         print("-e or --experiment to run all algorithms")
         print("-m or --kmeans to run only the k-means algorithm")
-        print("-o or --kmedoid to run only the k-medoid algorithm")
+        print("-o or --kmedoids to run only the k-medoid algorithm")
         print("-s or --dbscan to run only the dbscan algorithm\n")
         return -1
 
     args = parser.parse_args()
+
+    if not args.dataset and not args.generate:
+        print(
+            "Please specificy file to open {-d ./dataset.csv} or to generate datasets {-g}"
+        )
+        exit()
+
+    if not args.experiment and not (args.kmeans or args.kmedoids or args.dbscan):
+        print("Please specificy experiment {-e} or one of the following algorithms:")
+        print("\tk-means {-m}\n\tk-medoid {-o}\n\tdbscan {-s}")
+        exit()
 
     if args.dataset:
         print("Path to csv: {0}".format(args.dataset))
 
     if args.generate:
         print("The following datasets will be generated:")
-        print("\tlist some datasets")
+        for i in range(len(settings.datasetTypes)):
+            print("\t{0}".format(settings.datasetTypes[i]))
 
     return args
 

@@ -1,11 +1,22 @@
-from sklearn import datasets
-import pandas as pd
-import numpy as np
-from random import randint
 import math
+from random import randint
+
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+
 import matplotlib.pyplot as plt
 
-
+# ***************************************************************
+# Function:         run_kbrain
+# Variables/input:  int: k number of clusters to find
+#                   string: algorithm to perform
+#                   objects.dataset: dataset to work on
+# Output:           pandas dataframe: cluster assignments
+# Usage/Purpose:    Function calls k-means or k-medoid and
+#                   returns the cluster assignment for each
+#                   datapoint.
+# ***************************************************************
 def run_kbrain(k, algorithm, data):
 
     return_df = pd.DataFrame()
@@ -24,6 +35,15 @@ def run_kbrain(k, algorithm, data):
     return pd.DataFrame(label, columns=["cluster"])
 
 
+# ***************************************************************
+# Function:         autoplot
+# Variables/input:  int: k number of clusters to find
+#                   pandas dataframe: data to plot
+#                   float: coordinates of cluster centers
+#                   labels
+# Output:           generates plot of data clusterings
+# Usage/Purpose:    Function generates plots of data clusterings
+# ***************************************************************
 def autoplot(k, df, centers, labels, alg):
     # NOTE: Only works for two dimensions currently
     for n in range(0, k):
@@ -36,6 +56,14 @@ def autoplot(k, df, centers, labels, alg):
     plt.clf()
 
 
+# ***************************************************************
+# Function:         euclidean_distance
+# Variables/input:  list[float]: x, y coordinates of point 1
+#                   list[float]: x, y coordinates of point 2
+# Output:           float: distance between points
+# Usage/Purpose:    Function calculates the euclidean distance
+#                   between two points.
+# ***************************************************************
 def euclidean_distance(pointA, pointB):
     # Function returns the euclidean distance between two points
     return_dist = 0
@@ -48,6 +76,14 @@ def euclidean_distance(pointA, pointB):
     return math.sqrt(return_dist)
 
 
+# ***************************************************************
+# Function:         kmean
+# Variables/input:  int: k number of clusters to find
+#                   list[float]: cluster points
+#                   labels
+# Output:           list[float]: centroids
+# Usage/Purpose:    Function calculates centroids.
+# ***************************************************************
 def kmean(k, clusters, labels):
     # Function returns new centroids based on the means of the clusters
     return_centroids = []
@@ -65,6 +101,15 @@ def kmean(k, clusters, labels):
     return return_centroids
 
 
+# ***************************************************************
+# Function:         kmedoid
+# Variables/input:  int: k number of clusters to find
+#                   list[float]: cluster points
+#                   medoids
+#                   labels
+# Output:           list[float]: centroids
+# Usage/Purpose:    Function calculates centroids.
+# ***************************************************************
 def kmedoid(k, clusters, medoids, labels):
     # Function returns new medoids by calculating which point of the cluster
     # has the lowest entropy
@@ -109,6 +154,12 @@ def kmedoid(k, clusters, medoids, labels):
     return return_medoids
 
 
+# ***************************************************************
+# Function:         generate_random_dataset
+# Variables/input:  none
+# Output:           pandas dataframe: dataset points
+# Usage/Purpose:    Function generates a random dataset.
+# ***************************************************************
 def generate_random_dataset():
     # Function returns a dataframe with X/Y pairs and a column for cluster labels
     return_df = pd.DataFrame(columns=["x1", "x2"])
@@ -128,6 +179,13 @@ def generate_random_dataset():
     return return_df
 
 
+# ***************************************************************
+# Function:         generate_random_centers
+# Variables/input:  int: k number of clusters to find
+#                   pandas dataframe: dataset
+# Output:           list[float]: centers of clusters
+# Usage/Purpose:    Function generates a random center.
+# ***************************************************************
 def generate_random_centers(k, df):
     # Function returns random centers to begin clustering
     return_centers = []
@@ -156,6 +214,17 @@ def generate_random_centers(k, df):
     return return_centers
 
 
+# ***************************************************************
+# Function:         generate_clusters
+# Variables/input:  int: k number of clusters to find
+#                   list[float]: points
+#                   list[float]: centers
+#                   string: algorithm name
+# Output:           pandas dataframe: cluster assignments
+#                   cluster centers
+# Usage/Purpose:    Function generates clusters according to
+#                   k-means or k-medoid algorithm.
+# ***************************************************************
 def generate_clusters(k, points, centers, algorithm):
     # Function returns a list of cluster labels
     length = len(points.df)

@@ -1,13 +1,27 @@
 import pandas as pd
 
-
+# ***************************************************************
+# Function:         save_results
+# Variables/input:  pandas dataframe: results of each experiment
+# Output:           writes results to .csv file
+# Usage/Purpose:    Function writes the results of all experiments
+#                   to .csv file.
+# ***************************************************************
 def save_results(resultsDF):
     resultsDF.drop(["cluster_list", "dataset"], axis=1).to_csv(
         r"results.csv", index=False
     )
 
 
+# ***************************************************************
+# Function:         compile_results
+# Variables/input:  objects.experiment
+# Output:           pandas dataframe: resultsDF
+# Usage/Purpose:    Function creates a summary of all experiments
+#                   their parameters, and results.
+# ***************************************************************
 def compile_results(exp):
+    # set up new dataframe
     resultsDF = pd.DataFrame(
         columns=[
             "algo",
@@ -22,9 +36,9 @@ def compile_results(exp):
         ]
     )
 
-    # dbscan ds.name, num, i, eps, mp, results
-    # kmeans/kmedoid ds.name, num, i, numClusters, results
+    # loop through all results in the experiment
     for algo in exp.results.keys():
+        # write results summary of dbscan algorithms
         if algo == "DBSCAN" or algo == "sklearn_dbscan":
             for result in exp.results[algo]:
                 resultsDF = resultsDF.append(
@@ -42,6 +56,7 @@ def compile_results(exp):
                     ignore_index=True,
                 )
         else:
+            # write results to k-* algorithms
             for result in exp.results[algo]:
                 # kmeans/kmedoid ds.name, num, i, numClusters, results
 
